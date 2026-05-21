@@ -15,12 +15,18 @@ export function formatPrice(amount) {
 // ─── DURATION ───────────────────────────────────────────────
 /**
  * Converts total minutes into a readable string
- * e.g. 110 → "1h 50m"
+ * e.g. 110 → "1h 50m" ~Sawfy
  */
 export function formatDuration(mins) {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return m === 0 ? `${h}h` : `${h}h ${m}m`;
+  if (m === 0) {
+    return `${h}h`;
+  } else if (h === 0) {
+    return `${m}m`;
+  } else {
+    return `${h}h ${m}m`;
+  }
 }
 
 // ─── DATE ───────────────────────────────────────────────────
@@ -52,4 +58,16 @@ export function todayString() {
  */
 export function isPastDate(dateStr) {
   return new Date(dateStr + "T00:00:00") < new Date(new Date().toDateString());
+}
+
+export function handleBookingRef() {
+  const bookingRef = Math.random().toString(36).substring(2, 9).toUpperCase();
+
+  return bookingRef;
+}
+
+export function getPastDate(yearsInPast) {
+  const date = new Date();
+  date.setFullYear(date.getFullYear() - yearsInPast);
+  return date.toISOString().split("T")[0];
 }

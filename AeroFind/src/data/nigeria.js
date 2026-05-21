@@ -91,7 +91,7 @@ export function generateFlights(origin, destination, date) {
 
     for (let i = 0; i < numFlights; i++) {
       const departureTime = slots[rand(0, slots.length - 1)];
-      const durationMins = rand(55, 110); // ~1h to ~1h50m domestic
+      const durationMins = rand(45, 110); // ~1h to ~1h50m domestic
       const arrivalTime = addMinutes(departureTime, durationMins);
       const stops = rand(0, 10) < 8 ? 0 : 1; // 80% direct
       const basePrice = rand(55_000, 180_000); // NGN

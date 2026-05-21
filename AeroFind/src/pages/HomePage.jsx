@@ -11,10 +11,42 @@ export default function HomePage() {
   const [destination, setDestination] = useState("");
   const [departDate, setDepartDate] = useState(todayString());
   const [returnDate, setReturnDate] = useState("");
-  const [passengers, setPassengers] = useState(1);
-  const [children, setChildren] = useState(0);
-  const [infants, setInfants] = useState(0);
+  const [passengers, setPassengers] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+  });
+  const [showPaxDropdown, setShowPaxDropdown] = useState(false);
   const [error, setError] = useState("");
+
+  function updatePax(type, delta) {
+    setPassengers((prev) => {
+      const next = { ...prev, [type]: prev[type] + delta };
+
+      // adults: min 1, max 9
+      if (next.adults < 1 || next.adults > 9) return prev;
+
+      // children: min 0, max 8
+      if (next.children < 0 || next.children > 8) return prev;
+
+      // infants: min 0, can't exceed adults
+      if (next.infants < 0 || next.infants > next.adults) return prev;
+
+      // total passengers can't exceed 9
+      if (next.adults + next.children + next.infants > 9) return prev;
+
+      return next;
+    });
+  }
+
+  function paxSummary() {
+    const { adults, children, infants } = passengers;
+    const parts = [`${adults} Adult${adults > 1 ? "s" : ""}`];
+    if (children > 0)
+      parts.push(`${children} Child${children > 1 ? "ren" : ""}`);
+    if (infants > 0) parts.push(`${infants} Infant${infants > 1 ? "s" : ""}`);
+    return parts.join(", ");
+  }
 
   function handleSwap() {
     setOrigin(destination);
@@ -38,7 +70,9 @@ export default function HomePage() {
       origin,
       destination,
       date: departDate,
-      passengers,
+      adults: passengers.adults,
+      children: passengers.children,
+      infants: passengers.infants,
       tripType,
       ...(tripType === "round" && returnDate ? { returnDate } : {}),
     });
@@ -141,41 +175,94 @@ export default function HomePage() {
 
             {/* Passengers */}
             <div>
-              <label htmlFor="passengers">Passengers</label>
-              <input
-                id="passengers"
-                type="number"
-                min={1}
-                max={9}
-                value={passengers}
-                onChange={(e) => setPassengers(e.target.value)}
-              />
-            </div>
+              <label>Passengers</label>
+              <button
+                type="button"
+                onClick={() => setShowPaxDropdown(!showPaxDropdown)}
+              >
+                {paxSummary()} ▾
+              </button>
 
-            <div>
-              <label htmlFor="children">Children</label>
-              <input
-                id="children"
-                type="number"
-                min={0}
-                max={6}
-                value={children}
-                onChange={(e) => setChildren(e.target.value)}
-              />
-            </div>
+              {showPaxDropdown && (
+                <div>
+                  {/* Adults */}
+                  <div>
+                    <div>
+                      <span>Adult</span>
+                      <span>12 years and above</span>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("adults", -1)}
+                      >
+                        -
+                      </button>
+                      <span>{passengers.adults}</span>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("adults", +1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
 
-            <div>
-              <label htmlFor="infants">Infants</label>
-              <input
-                id="infants"
-                type="number"
-                min={0}
-                max={2}
-                value={infants}
-                onChange={(e) => setInfants(e.target.value)}
-              />
-            </div>
+                  {/* Children */}
+                  <div>
+                    <div>
+                      <span>Child</span>
+                      <span>2 - 11 years</span>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("children", -1)}
+                      >
+                        -
+                      </button>
+                      <span>{passengers.children}</span>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("children", +1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
 
+                  {/* Infants */}
+                  <div>
+                    <div>
+                      <span>Infant</span>
+                      <span>Under 2 years · sits on lap</span>
+                    </div>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("infants", -1)}
+                      >
+                        -
+                      </button>
+                      <span>{passengers.infants}</span>
+                      <button
+                        type="button"
+                        onClick={() => updatePax("infants", +1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPaxDropdown(false)}
+                  >
+                    Done
+                  </button>
+                </div>
+              )}
+            </div>
             {/* Error */}
             {error && <p>{error}</p>}
 
