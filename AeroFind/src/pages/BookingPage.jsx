@@ -1,19 +1,14 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { AIRPORTS } from "../data/nigeria";
-import {
-  formatPrice,
-  formatDate,
-  todayString,
-  handleBookingRef,
-  getPastDate,
-} from "../utils/formatters";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { AIRPORTS, AIRLINES } from "../data/nigeria";
+import { formatPrice, formatDate, handleBookingRef } from "../utils/formatters";
+import styles from "./BookingPage.module.css";
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  // ─── READ URL PARAMS ──────────────────────────────────────
+  // ─── URL PARAMS ───────────────────────────────────────────
   const origin = searchParams.get("origin");
   const destination = searchParams.get("destination");
   const date = searchParams.get("date");
@@ -25,39 +20,52 @@ export default function BookingPage() {
   const totalPrice = Number(searchParams.get("totalPrice"));
   const flightId = searchParams.get("flightId");
 
-  // ─── DERIVE AIRPORT NAMES ─────────────────────────────────
+  // ─── DERIVED DATA ─────────────────────────────────────────
   const originAirport = AIRPORTS.find((a) => a.code === origin);
   const destinationAirport = AIRPORTS.find((a) => a.code === destination);
 
-  // ─── BUILD PASSENGER SLOTS ────────────────────────────────
-  // e.g. 2 adults + 1 child = ['adult', 'adult', 'child']
+  // parse airline code + flight number from flightId
+  // flightId format: "AT-2026-06-10-LOS-ABV-0"
+  const flightCode = flightId?.split("-")[0] ?? "";
+  const airline = AIRLINES.find((a) => a.code === flightCode);
+  const flightNumber = flightId?.split("-").slice(0, 2).join("") ?? "";
+
+  // ─── PASSENGER SLOTS ──────────────────────────────────────
   const passengerSlots = [
     ...Array(adults).fill("adult"),
     ...Array(children).fill("child"),
     ...Array(infants).fill("infant"),
   ];
 
-  // ─── PASSENGER FORM STATE ─────────────────────────────────
-  // One form entry per passenger slot
+  // ─── PRICE BREAKDOWN ──────────────────────────────────────
+  // back-calculate base price per adult from totalPrice
+  const basePricePerAdult = useMemo(() => {
+    const divisor = adults + children * 0.75 + infants * 0.1;
+    return divisor > 0 ? totalPrice / divisor : 0;
+  }, [totalPrice, adults, children, infants]);
+
+  // ─── STATE ────────────────────────────────────────────────
   const emptyPassenger = { firstName: "", lastName: "", gender: "", dob: "" };
   const [passengerForms, setPassengerForms] = useState(
     passengerSlots.map(() => ({ ...emptyPassenger })),
   );
-
-  // ─── CONTACT DETAILS STATE ────────────────────────────────
   const [contact, setContact] = useState({ email: "", phone: "" });
-
-  // ─── BOOKING CONFIRMED STATE ──────────────────────────────
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
 
-  // ─── UPDATE A SINGLE PASSENGER FIELD ─────────────────────
+  // ─── HELPERS ──────────────────────────────────────────────
   function updatePassenger(index, field, value) {
     setPassengerForms((prev) => {
       const next = [...prev];
       next[index] = { ...next[index], [field]: value };
       return next;
     });
+  }
+
+  function badgeClass(type) {
+    if (type === "adult") return styles.badgeAdult;
+    if (type === "child") return styles.badgeChild;
+    return styles.badgeInfant;
   }
 
   // ─── VALIDATION ───────────────────────────────────────────
@@ -91,9 +99,18 @@ export default function BookingPage() {
   // ─── GUARD ────────────────────────────────────────────────
   if (!origin || !destination || !date || !flightId) {
     return (
-      <div>
-        <p>Invalid booking. Please search for a flight first.</p>
-        <button onClick={() => navigate("/")}>Back to search</button>
+      <div className={styles.confirmPage}>
+        <div className={styles.confirmCard}>
+          <p className={styles.confirmTitle}>Invalid booking</p>
+          <p
+            style={{ color: "var(--color-text-muted)", marginBottom: "1.5rem" }}
+          >
+            Please search for a flight first.
+          </p>
+          <button className={styles.newSearchBtn} onClick={() => navigate("/")}>
+            Back to search
+          </button>
+        </div>
       </div>
     );
   }
@@ -102,182 +119,267 @@ export default function BookingPage() {
   if (confirmed) {
     const bookingRef = handleBookingRef();
     return (
-      <div>
-        <header>
-          <span onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-            ✈ AeroFind
-          </span>
-        </header>
+      <div className={styles.confirmPage}>
+        <div className={styles.confirmCard}>
+          <div className={styles.confirmIcon}>🎉</div>
+          <h2 className={styles.confirmTitle}>Booking Confirmed!</h2>
+          <div className={styles.confirmRef}>{bookingRef}</div>
 
-        <section>
-          <h2>Booking Confirmed! 🎉</h2>
-          <p>
-            Booking reference: <strong>{bookingRef}</strong>
+          <div className={styles.confirmDetails}>
+            <div className={styles.confirmRow}>
+              <span className={styles.confirmRowLabel}>Route</span>
+              <span className={styles.confirmRowValue}>
+                {originAirport?.city} → {destinationAirport?.city}
+              </span>
+            </div>
+            <div className={styles.confirmRow}>
+              <span className={styles.confirmRowLabel}>Date</span>
+              <span className={styles.confirmRowValue}>{formatDate(date)}</span>
+            </div>
+            {tripType === "round" && returnDate && (
+              <div className={styles.confirmRow}>
+                <span className={styles.confirmRowLabel}>Return</span>
+                <span className={styles.confirmRowValue}>
+                  {formatDate(returnDate)}
+                </span>
+              </div>
+            )}
+            <div className={styles.confirmRow}>
+              <span className={styles.confirmRowLabel}>Passengers</span>
+              <span className={styles.confirmRowValue}>
+                {passengerSlots.length} passenger
+                {passengerSlots.length > 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className={styles.confirmRow}>
+              <span className={styles.confirmRowLabel}>Total paid</span>
+              <span className={styles.confirmRowValue}>
+                {formatPrice(totalPrice)}
+              </span>
+            </div>
+          </div>
+
+          <p className={styles.confirmEmail}>
+            Confirmation sent to <strong>{contact.email}</strong>
           </p>
-          <p>
-            {originAirport.city} → {destinationAirport.city}
-          </p>
-          <p>{formatDate(date)}</p>
-          <p>
-            {passengerSlots.length} Passenger
-            {passengerSlots.length > 1 ? "s" : ""}
-          </p>
-          <p>Total paid: {formatPrice(totalPrice)}</p>
-          <p>A confirmation will be sent to {contact.email}</p>
-          <button onClick={() => navigate("/")}>Book another flight</button>
-        </section>
+
+          <button className={styles.newSearchBtn} onClick={() => navigate("/")}>
+            Book another flight
+          </button>
+        </div>
       </div>
     );
   }
 
   // ─── MAIN BOOKING FORM ────────────────────────────────────
   return (
-    <div>
-      <header>
-        <span onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+    <div className={styles.page}>
+      {/* Navbar */}
+      <header className={styles.navbar}>
+        <span className={styles.logo} onClick={() => navigate("/")}>
           ✈ AeroFind
         </span>
+        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+          ← Back to results
+        </button>
       </header>
 
       <form onSubmit={handleConfirm}>
-        {/* Flight summary */}
-        <section>
-          <h2>Flight Summary</h2>
-          <p>
-            {originAirport.city} ({origin}) → {destinationAirport.city} (
-            {destination})
-          </p>
-          <p>{formatDate(date)}</p>
-          {tripType === "round" && returnDate && (
-            <p>Return: {formatDate(returnDate)}</p>
-          )}
-          <p>Flight: {flightId.split("-")[0]}</p>
-        </section>
-
-        {/* Passenger forms */}
-        <section>
-          <h2>Passenger Details</h2>
-
-          {passengerSlots.map((type, index) => (
-            <div key={index}>
-              <h3>
-                Passenger {index + 1} —{" "}
-                {type.charAt(0).toUpperCase() + type.substring(1)}
-              </h3>
-
-              <div>
-                <label>First name</label>
-                <input
-                  type="text"
-                  value={passengerForms[index].firstName}
-                  onChange={(e) =>
-                    updatePassenger(index, "firstName", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label>Last name</label>
-                <input
-                  type="text"
-                  value={passengerForms[index].lastName}
-                  onChange={(e) =>
-                    updatePassenger(index, "lastName", e.target.value)
-                  }
-                />
-              </div>
-
-              <div>
-                <label>Gender</label>
-                <select
-                  value={passengerForms[index].gender}
-                  onChange={(e) =>
-                    updatePassenger(index, "gender", e.target.value)
-                  }
-                >
-                  <option value="">Select</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Prefer not to say</option>
-                </select>
-              </div>
-
-              {/* DOB only for children and infants */}
-              {type === "infant" && (
-                <div>
-                  <label>Date of birth</label>
-                  <input
-                    type="date"
-                    max={todayString()}
-                    min={getPastDate(2)}
-                    value={passengerForms[index].dob}
-                    onChange={(e) =>
-                      updatePassenger(index, "dob", e.target.value)
-                    }
-                  />
+        <div className={styles.main}>
+          {/* ── LEFT COLUMN ── */}
+          <div>
+            {/* Flight summary */}
+            <div className={styles.card}>
+              <h2 className={styles.cardTitle}>Your Flight</h2>
+              <div className={styles.flightSummary}>
+                <div className={styles.summaryTimes}>
+                  <div className={styles.summaryTimeBlock}>
+                    <span className={styles.summaryTime}>
+                      {flightId?.split("-")[4] ?? "--:--"}
+                    </span>
+                    <span className={styles.summaryAirport}>{origin}</span>
+                  </div>
+                  <span className={styles.summaryArrow}>——✈——</span>
+                  <div className={styles.summaryTimeBlock}>
+                    <span className={styles.summaryTime}>
+                      {flightId?.split("-")[5] ?? "--:--"}
+                    </span>
+                    <span className={styles.summaryAirport}>{destination}</span>
+                  </div>
                 </div>
-              )}
-
-              {type === "child" && (
-                <div>
-                  <label>Date of birth</label>
-                  <input
-                    type="date"
-                    max={getPastDate(2)}
-                    min={getPastDate(11)}
-                    value={passengerForms[index].dob}
-                    onChange={(e) =>
-                      updatePassenger(index, "dob", e.target.value)
-                    }
-                  />
+                <div className={styles.summaryMeta}>
+                  <span className={styles.summaryAirline}>
+                    {airline?.name ?? "Airline"}
+                  </span>
+                  <span className={styles.summaryFlight}>
+                    {flightId?.split("-")[0]}
+                    {flightId?.split("-")[1]}
+                  </span>
+                  <span className={styles.summaryDate}>{formatDate(date)}</span>
                 </div>
-              )}
+              </div>
             </div>
-          ))}
-        </section>
 
-        {/* Contact details */}
-        <section>
-          <h2>Contact Details</h2>
-          <p>Your booking confirmation will be sent here</p>
+            {/* Passenger forms */}
+            {passengerSlots.map((type, index) => (
+              <div key={index} className={styles.passengerCard}>
+                <div className={styles.passengerHeader}>
+                  <h3 className={styles.passengerTitle}>
+                    Passenger {index + 1}
+                  </h3>
+                  <span
+                    className={`${styles.passengerBadge} ${badgeClass(type)}`}
+                  >
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </span>
+                </div>
 
-          <div>
-            <label>Email address</label>
-            <input
-              type="email"
-              value={contact.email}
-              onChange={(e) =>
-                setContact({ ...contact, email: e.target.value })
-              }
-            />
+                <div className={styles.formGrid}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>First name</label>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      placeholder="e.g. Sawfiyah"
+                      value={passengerForms[index].firstName}
+                      onChange={(e) =>
+                        updatePassenger(index, "firstName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label className={styles.label}>Last name</label>
+                    <input
+                      className={styles.input}
+                      type="text"
+                      placeholder="e.g. Bagudu"
+                      value={passengerForms[index].lastName}
+                      onChange={(e) =>
+                        updatePassenger(index, "lastName", e.target.value)
+                      }
+                    />
+                  </div>
+
+                  <div
+                    className={`${styles.field} ${type !== "adult" ? "" : styles.formGridFull}`}
+                  >
+                    <label className={styles.label}>Gender</label>
+                    <select
+                      className={styles.select}
+                      value={passengerForms[index].gender}
+                      onChange={(e) =>
+                        updatePassenger(index, "gender", e.target.value)
+                      }
+                    >
+                      <option value="">Select</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Prefer not to say</option>
+                    </select>
+                  </div>
+
+                  {type !== "adult" && (
+                    <div className={styles.field}>
+                      <label className={styles.label}>Date of birth</label>
+                      <input
+                        className={styles.input}
+                        type="date"
+                        value={passengerForms[index].dob}
+                        onChange={(e) =>
+                          updatePassenger(index, "dob", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {/* Contact details */}
+            <div className={styles.card}>
+              <h2 className={styles.cardTitle}>Contact Details</h2>
+              <div className={styles.contactGrid}>
+                <div className={styles.field}>
+                  <label className={styles.label}>Email address</label>
+                  <input
+                    className={styles.input}
+                    type="email"
+                    placeholder="you@example.com"
+                    value={contact.email}
+                    onChange={(e) =>
+                      setContact({ ...contact, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Phone number</label>
+                  <input
+                    className={styles.input}
+                    type="tel"
+                    placeholder="08012345678"
+                    value={contact.phone}
+                    onChange={(e) =>
+                      setContact({ ...contact, phone: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {error && <p className={styles.error}>⚠ {error}</p>}
           </div>
 
-          <div>
-            <label>Phone number</label>
-            <input
-              type="tel"
-              value={contact.phone}
-              onChange={(e) =>
-                setContact({ ...contact, phone: e.target.value })
-              }
-            />
+          {/* ── RIGHT SIDEBAR ── */}
+          <div className={styles.sidebar}>
+            <div className={styles.priceCard}>
+              <h3 className={styles.priceTitle}>Price Summary</h3>
+
+              {adults > 0 && (
+                <div className={styles.priceRow}>
+                  <span>
+                    {adults} Adult{adults > 1 ? "s" : ""} x{" "}
+                    {formatPrice(basePricePerAdult)}
+                  </span>
+                  <span>{formatPrice(basePricePerAdult * adults)}</span>
+                </div>
+              )}
+              {children > 0 && (
+                <div className={styles.priceRow}>
+                  <span>
+                    {children} Child{children > 1 ? "ren" : ""} ×{" "}
+                    {formatPrice(basePricePerAdult * 0.75)}
+                  </span>
+                  <span>
+                    {formatPrice(basePricePerAdult * 0.75 * children)}
+                  </span>
+                </div>
+              )}
+              {infants > 0 && (
+                <div className={styles.priceRow}>
+                  <span>
+                    {infants} Infant{infants > 1 ? "s" : ""} x{" "}
+                    {formatPrice(basePricePerAdult * 0.1)}
+                  </span>
+                  <span>{formatPrice(basePricePerAdult * 0.1 * infants)}</span>
+                </div>
+              )}
+
+              <div className={styles.priceRowTotal}>
+                <span>Total</span>
+                <span>{formatPrice(totalPrice)}</span>
+              </div>
+
+              <button type="submit" className={styles.confirmBtn}>
+                Confirm booking →
+              </button>
+
+              <p className={styles.secureNote}>
+                🔒 Secure booking · No hidden fees
+              </p>
+            </div>
           </div>
-        </section>
-
-        {/* Price summary */}
-        <section>
-          <h2>Price Summary</h2>
-          <p>Total: {formatPrice(totalPrice)}</p>
-          <p>
-            {adults > 0 && `${adults} Adult${adults > 1 ? "s" : ""}`}
-            {children > 0 && ` · ${children} Child${children > 1 ? "ren" : ""}`}
-            {infants > 0 && ` · ${infants} Infant${infants > 1 ? "s" : ""}`}
-          </p>
-        </section>
-
-        {error && <p>{error}</p>}
-
-        <button type="submit">Confirm booking</button>
+        </div>
       </form>
     </div>
   );

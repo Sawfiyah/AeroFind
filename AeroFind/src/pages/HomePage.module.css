@@ -1,0 +1,375 @@
+/* ─── LAYOUT ───────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── NAVBAR ───────────────────────────────────────────────── */
+.navbar {
+  height: var(--nav-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLinks a {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  transition: color 0.15s;
+}
+
+.navLinks a:hover {
+  color: var(--color-text);
+}
+
+/* ─── HERO ─────────────────────────────────────────────────── */
+.hero {
+  background: var(--color-primary);
+  padding: 3rem 2rem 5rem;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.heroSub {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ─── SEARCH CARD ──────────────────────────────────────────── */
+.cardWrap {
+  max-width: var(--max-width);
+  margin: -2.5rem auto 0;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ─── TRIP TABS ────────────────────────────────────────────── */
+.tripTabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.25rem;
+}
+
+.tab {
+  padding: 6px 16px;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  transition: all 0.15s;
+}
+
+.tab:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.tabActive {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* ─── AIRPORT ROW ──────────────────────────────────────────── */
+.airportRow {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.airportRow .field {
+  flex: 1;
+}
+
+.swapBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+  transition: all 0.15s;
+}
+
+.swapBtn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* ─── FORM GRID ────────────────────────────────────────────── */
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+/* ─── FIELD ────────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-subtle);
+}
+
+.input,
+.select {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+/* ─── PASSENGERS DROPDOWN ──────────────────────────────────── */
+.paxTrigger {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  text-align: left;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color 0.15s;
+}
+
+.paxTrigger:hover,
+.paxTriggerOpen {
+  border-color: var(--color-primary);
+}
+
+.paxDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  box-shadow: var(--shadow-md);
+  z-index: 50;
+}
+
+.paxWrap {
+  position: relative;
+}
+
+.paxRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.paxRow:last-of-type {
+  border-bottom: none;
+}
+
+.paxInfo span:first-child {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.paxInfo span:last-child {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.paxControls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.paxBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border-strong);
+  background: transparent;
+  color: var(--color-text);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.paxBtn:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.paxBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.paxCount {
+  font-size: 0.95rem;
+  font-weight: 500;
+  min-width: 16px;
+  text-align: center;
+}
+
+.paxDone {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 8px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* ─── SEARCH BUTTON ────────────────────────────────────────── */
+.searchBtn {
+  width: 100%;
+  padding: 13px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.searchBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ─── ERROR ────────────────────────────────────────────────── */
+.error {
+  color: var(--color-error);
+  font-size: 0.85rem;
+  background: var(--color-error-light);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 0.75rem;
+}
+
+/* ─── POPULAR ROUTES ───────────────────────────────────────── */
+.main {
+  max-width: var(--max-width);
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+.sectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 1rem;
+}
+
+.routesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-bottom: 2.5rem;
+}
+
+.routeCard {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.routeCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.routeCities {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.routeLabel {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.routePrice {
+  font-size: 0.85rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}

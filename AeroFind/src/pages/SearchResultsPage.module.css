@@ -1,0 +1,312 @@
+/* ─── LAYOUT ───────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── NAVBAR ───────────────────────────────────────────────── */
+.navbar {
+  height: var(--nav-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+  letter-spacing: -0.02em;
+}
+
+/* ─── SEARCH SUMMARY BAR ───────────────────────────────────── */
+.summaryBar {
+  background: var(--color-primary);
+  padding: 1.25rem 2rem;
+}
+
+.summaryInner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.summaryRoute {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.summaryMeta {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 2px;
+}
+
+.modifyBtn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-xl);
+  background: transparent;
+  color: #ffffff;
+  font-size: 0.875rem;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.modifyBtn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+/* ─── MAIN CONTENT ─────────────────────────────────────────── */
+.main {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+/* ─── SORT BAR ─────────────────────────────────────────────── */
+.sortBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.resultsCount {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.sortBtns {
+  display: flex;
+  gap: 6px;
+}
+
+.sortBtn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.sortBtn:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.sortBtnActive {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* ─── FLIGHT CARD ──────────────────────────────────────────── */
+.flightCard {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 10px;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  gap: 1.5rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.flightCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── AIRLINE COLUMN ───────────────────────────────────────── */
+.airlineCol {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.airlineName {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.flightNumber {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── TIMES COLUMN ─────────────────────────────────────────── */
+.timesCol {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.timeBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.time {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.airportCode {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.durationBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.durationLine {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-strong);
+}
+
+.plane {
+  font-size: 0.85rem;
+}
+
+.durationText {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.stops {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: var(--radius-xl);
+  font-weight: 500;
+}
+
+.stopsDirect {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.stopsOne {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+/* ─── PRICE COLUMN ─────────────────────────────────────────── */
+.priceCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.price {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+}
+
+.paxNote {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.seatsLeft {
+  font-size: 0.75rem;
+  color: var(--color-error);
+  font-weight: 500;
+}
+
+.seatsLeftOk {
+  font-size: 0.75rem;
+  color: var(--color-text-subtle);
+}
+
+.selectBtn {
+  padding: 9px 20px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.selectBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ─── EMPTY STATE ──────────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.emptyTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.25rem;
+}
+
+.backBtn {
+  padding: 10px 20px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AIRPORTS } from "../data/nigeria";
 import { todayString } from "../utils/formatters";
+import styles from "./HomePage.module.css";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -81,38 +82,53 @@ export default function HomePage() {
   }
 
   return (
-    <div>
-      <header>
-        <span>✈ AeroFind</span>
-        <nav>
+    <div className={styles.page}>
+      <header className={styles.navbar}>
+        <span className={styles.logo}>✈ AeroFind</span>
+        <nav className={styles.navLinks}>
           <a href="/">Home</a>
           <a href="#">My Trips</a>
           <a href="#">Help</a>
         </nav>
       </header>
 
-      <main>
-        <section>
-          <h1>Fly anywhere in Nigeria</h1>
-          <p>Search flights across all major domestic routes</p>
+      <div className={styles.hero}>
+        <h1 className={styles.heroTitle}>Fly anywhere in Nigeria</h1>
+        <p className={styles.heroSub}>
+          Search flights across all major domestic routes
+        </p>
+      </div>
+
+      <div className={styles.cardWrap}>
+        <div className={styles.card}>
+          {/* Trip tabs */}
+          <div className={styles.tripTabs}>
+            <button
+              type="button"
+              className={`${styles.tab} ${tripType === "round" ? styles.tabActive : ""}`}
+              onClick={() => setTripType("round")}
+            >
+              Round trip
+            </button>
+            <button
+              type="button"
+              className={`${styles.tab} ${tripType === "oneway" ? styles.tabActive : ""}`}
+              onClick={() => setTripType("oneway")}
+            >
+              One way
+            </button>
+          </div>
 
           <form onSubmit={handleSearch}>
-            {/* Trip type toggle */}
-            <div>
-              <button type="button" onClick={() => setTripType("round")}>
-                Round trip
-              </button>
-              <button type="button" onClick={() => setTripType("oneway")}>
-                One way
-              </button>
-            </div>
-
             {/* Origin & destination */}
-            <div>
-              <div>
-                <label htmlFor="origin">From</label>
+            <div className={styles.airportRow}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="origin">
+                  From
+                </label>
                 <select
                   id="origin"
+                  className={styles.select}
                   value={origin}
                   onChange={(e) => setOrigin(e.target.value)}
                 >
@@ -125,14 +141,21 @@ export default function HomePage() {
                 </select>
               </div>
 
-              <button type="button" onClick={handleSwap}>
+              <button
+                type="button"
+                className={styles.swapBtn}
+                onClick={handleSwap}
+              >
                 ⇄
               </button>
 
-              <div>
-                <label htmlFor="destination">To</label>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="destination">
+                  To
+                </label>
                 <select
                   id="destination"
+                  className={styles.select}
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
                 >
@@ -146,13 +169,16 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Dates */}
-            <div>
-              <div>
-                <label htmlFor="departDate">Depart</label>
+            {/* Dates + passengers */}
+            <div className={styles.formGrid}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="departDate">
+                  Depart
+                </label>
                 <input
                   id="departDate"
                   type="date"
+                  className={styles.input}
                   value={departDate}
                   min={todayString()}
                   onChange={(e) => setDepartDate(e.target.value)}
@@ -160,115 +186,153 @@ export default function HomePage() {
               </div>
 
               {tripType === "round" && (
-                <div>
-                  <label htmlFor="returnDate">Return</label>
+                <div className={styles.field}>
+                  <label className={styles.label} htmlFor="returnDate">
+                    Return
+                  </label>
                   <input
                     id="returnDate"
                     type="date"
+                    className={styles.input}
                     value={returnDate}
                     min={departDate || todayString()}
                     onChange={(e) => setReturnDate(e.target.value)}
                   />
                 </div>
               )}
-            </div>
 
-            {/* Passengers */}
-            <div>
-              <label>Passengers</label>
-              <button
-                type="button"
-                onClick={() => setShowPaxDropdown(!showPaxDropdown)}
-              >
-                {paxSummary()} ▾
-              </button>
-
-              {showPaxDropdown && (
-                <div>
-                  {/* Adults */}
-                  <div>
-                    <div>
-                      <span>Adult</span>
-                      <span>12 years and above</span>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("adults", -1)}
-                      >
-                        -
-                      </button>
-                      <span>{passengers.adults}</span>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("adults", +1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Children */}
-                  <div>
-                    <div>
-                      <span>Child</span>
-                      <span>2 - 11 years</span>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("children", -1)}
-                      >
-                        -
-                      </button>
-                      <span>{passengers.children}</span>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("children", +1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Infants */}
-                  <div>
-                    <div>
-                      <span>Infant</span>
-                      <span>Under 2 years · sits on lap</span>
-                    </div>
-                    <div>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("infants", -1)}
-                      >
-                        -
-                      </button>
-                      <span>{passengers.infants}</span>
-                      <button
-                        type="button"
-                        onClick={() => updatePax("infants", +1)}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
+              {/* Passengers */}
+              <div className={styles.field}>
+                <label className={styles.label}>Passengers</label>
+                <div className={styles.paxWrap}>
                   <button
                     type="button"
-                    onClick={() => setShowPaxDropdown(false)}
+                    className={`${styles.paxTrigger} ${showPaxDropdown ? styles.paxTriggerOpen : ""}`}
+                    onClick={() => setShowPaxDropdown(!showPaxDropdown)}
                   >
-                    Done
+                    <span>{paxSummary()}</span>
+                    <span>{showPaxDropdown ? "▴" : "▾"}</span>
                   </button>
-                </div>
-              )}
-            </div>
-            {/* Error */}
-            {error && <p>{error}</p>}
 
-            <button type="submit">Search flights</button>
+                  {showPaxDropdown && (
+                    <div className={styles.paxDropdown}>
+                      {[
+                        {
+                          key: "adults",
+                          label: "Adult",
+                          sub: "12 years and above",
+                          min: 1,
+                        },
+                        {
+                          key: "children",
+                          label: "Child",
+                          sub: "2 - 11 years",
+                          min: 0,
+                        },
+                        {
+                          key: "infants",
+                          label: "Infant",
+                          sub: "Under 2 · lap seat",
+                          min: 0,
+                        },
+                      ].map(({ key, label, sub, min }) => (
+                        <div key={key} className={styles.paxRow}>
+                          <div className={styles.paxInfo}>
+                            <span>{label}</span>
+                            <span>{sub}</span>
+                          </div>
+                          <div className={styles.paxControls}>
+                            <button
+                              type="button"
+                              className={styles.paxBtn}
+                              onClick={() => updatePax(key, -1)}
+                              disabled={passengers[key] <= min}
+                            >
+                              -
+                            </button>
+                            <span className={styles.paxCount}>
+                              {passengers[key]}
+                            </span>
+                            <button
+                              type="button"
+                              className={styles.paxBtn}
+                              onClick={() => updatePax(key, +1)}
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                      <button
+                        type="button"
+                        className={styles.paxDone}
+                        onClick={() => setShowPaxDropdown(false)}
+                      >
+                        Done
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {error && <p className={styles.error}>{error}</p>}
+
+            <button type="submit" className={styles.searchBtn}>
+              Search flights →
+            </button>
           </form>
-        </section>
+        </div>
+      </div>
+
+      {/* Popular routes */}
+      <main className={styles.main}>
+        <p className={styles.sectionTitle}>Popular routes</p>
+        <div className={styles.routesGrid}>
+          {[
+            {
+              from: "LOS",
+              to: "ABV",
+              label: "Lagos → Abuja",
+              price: "₦55,000",
+            },
+            {
+              from: "ABV",
+              to: "LOS",
+              label: "Abuja → Lagos",
+              price: "₦57,000",
+            },
+            {
+              from: "LOS",
+              to: "PHC",
+              label: "Lagos → Port Harcourt",
+              price: "₦60,000",
+            },
+            {
+              from: "LOS",
+              to: "ENU",
+              label: "Lagos → Enugu",
+              price: "₦69,000",
+            },
+            { from: "ABV", to: "KAN", label: "Abuja → Kano", price: "₦58,000" },
+          ].map((r) => (
+            <div
+              key={r.from + r.to}
+              className={styles.routeCard}
+              onClick={() => {
+                setOrigin(r.from);
+                setDestination(r.to);
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            >
+              <div className={styles.routeCities}>
+                {r.from} → {r.to}
+              </div>
+              <div className={styles.routeLabel}>{r.label}</div>
+              <div className={styles.routePrice}>from {r.price}</div>
+            </div>
+          ))}
+        </div>
       </main>
     </div>
   );
