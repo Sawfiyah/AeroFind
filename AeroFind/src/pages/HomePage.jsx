@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AIRPORTS } from "../data/nigeria";
 import { todayString } from "../utils/formatters";
+import Navbar from "../components/layout/Navbar";
 import styles from "./HomePage.module.css";
 
 export default function HomePage() {
@@ -83,14 +84,7 @@ export default function HomePage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.navbar}>
-        <span className={styles.logo}>✈ AeroFind</span>
-        <nav className={styles.navLinks}>
-          <a href="/">Home</a>
-          <a href="#">My Trips</a>
-          <a href="#">Help</a>
-        </nav>
-      </header>
+      <Navbar />
 
       <div className={styles.hero}>
         <h1 className={styles.heroTitle}>Fly anywhere in Nigeria</h1>

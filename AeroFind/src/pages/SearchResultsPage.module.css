@@ -5,28 +5,6 @@
   flex-direction: column;
 }
 
-/* ─── NAVBAR ───────────────────────────────────────────────── */
-.navbar {
-  height: var(--nav-height);
-  background: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  cursor: pointer;
-  letter-spacing: -0.02em;
-}
-
 /* ─── SEARCH SUMMARY BAR ───────────────────────────────────── */
 .summaryBar {
   background: var(--color-primary);
@@ -309,4 +287,50 @@
   border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 600;
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .flightCard {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+  }
+
+  .timesCol {
+    grid-column: 1 / -1;
+  }
+
+  .main {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .flightCard {
+    grid-template-columns: 1fr;
+  }
+
+  .priceCol {
+    align-items: flex-start;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  .selectBtn {
+    width: 100%;
+  }
+
+  .summaryBar {
+    padding: 1rem;
+  }
+
+  .sortBtns {
+    gap: 4px;
+  }
+
+  .sortBtn {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
 }

@@ -1,8 +1,15 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { AIRPORTS, AIRLINES } from "../data/nigeria";
-import { formatPrice, formatDate, handleBookingRef } from "../utils/formatters";
+import {
+  formatPrice,
+  formatDate,
+  handleBookingRef,
+  todayString,
+  getPastDate,
+} from "../utils/formatters";
 import styles from "./BookingPage.module.css";
+import tick from "../assets/tick.png";
 
 export default function BookingPage() {
   const [searchParams] = useSearchParams();
@@ -19,6 +26,7 @@ export default function BookingPage() {
   const infants = Number(searchParams.get("infants"));
   const totalPrice = Number(searchParams.get("totalPrice"));
   const flightId = searchParams.get("flightId");
+  const flightNumber = searchParams.get("flightNumber");
 
   // ─── DERIVED DATA ─────────────────────────────────────────
   const originAirport = AIRPORTS.find((a) => a.code === origin);
@@ -28,7 +36,6 @@ export default function BookingPage() {
   // flightId format: "AT-2026-06-10-LOS-ABV-0"
   const flightCode = flightId?.split("-")[0] ?? "";
   const airline = AIRLINES.find((a) => a.code === flightCode);
-  const flightNumber = flightId?.split("-").slice(0, 2).join("") ?? "";
 
   // ─── PASSENGER SLOTS ──────────────────────────────────────
   const passengerSlots = [
@@ -121,7 +128,10 @@ export default function BookingPage() {
     return (
       <div className={styles.confirmPage}>
         <div className={styles.confirmCard}>
-          <div className={styles.confirmIcon}>🎉</div>
+          <div>
+            {" "}
+            <img src={tick} className={styles.confirmImg} />{" "}
+          </div>
           <h2 className={styles.confirmTitle}>Booking Confirmed!</h2>
           <div className={styles.confirmRef}>{bookingRef}</div>
 
@@ -211,10 +221,7 @@ export default function BookingPage() {
                   <span className={styles.summaryAirline}>
                     {airline?.name ?? "Airline"}
                   </span>
-                  <span className={styles.summaryFlight}>
-                    {flightId?.split("-")[0]}
-                    {flightId?.split("-")[1]}
-                  </span>
+                  <span className={styles.summaryFlight}>{flightNumber}</span>
                   <span className={styles.summaryDate}>{formatDate(date)}</span>
                 </div>
               </div>
@@ -279,12 +286,30 @@ export default function BookingPage() {
                     </select>
                   </div>
 
-                  {type !== "adult" && (
+                  {type === "infant" && (
                     <div className={styles.field}>
                       <label className={styles.label}>Date of birth</label>
                       <input
                         className={styles.input}
                         type="date"
+                        max={todayString()}
+                        min={getPastDate(2)}
+                        value={passengerForms[index].dob}
+                        onChange={(e) =>
+                          updatePassenger(index, "dob", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {type === "child" && (
+                    <div className={styles.field}>
+                      <label className={styles.label}>Date of birth</label>
+                      <input
+                        className={styles.input}
+                        type="date"
+                        max={getPastDate(2)}
+                        min={getPastDate(11)}
                         value={passengerForms[index].dob}
                         onChange={(e) =>
                           updatePassenger(index, "dob", e.target.value)
@@ -347,7 +372,7 @@ export default function BookingPage() {
               {children > 0 && (
                 <div className={styles.priceRow}>
                   <span>
-                    {children} Child{children > 1 ? "ren" : ""} ×{" "}
+                    {children} Child{children > 1 ? "ren" : ""} x{" "}
                     {formatPrice(basePricePerAdult * 0.75)}
                   </span>
                   <span>

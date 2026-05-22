@@ -2,6 +2,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { useState, useMemo } from "react";
 import { generateFlights } from "../data/nigeria";
 import { formatPrice, formatDuration, formatDate } from "../utils/formatters";
+import Navbar from "../components/layout/Navbar";
 import styles from "./SearchResultsPage.module.css";
 
 export default function SearchResultsPage() {
@@ -52,6 +53,7 @@ export default function SearchResultsPage() {
   function handleSelect(flight) {
     const params = new URLSearchParams({
       flightId: flight.id,
+      flightNumber: flight.flightNumber,
       origin,
       destination,
       date,
@@ -86,11 +88,7 @@ export default function SearchResultsPage() {
   return (
     <div className={styles.page}>
       {/* Navbar */}
-      <header className={styles.navbar}>
-        <span className={styles.logo} onClick={() => navigate("/")}>
-          ✈ AeroFind
-        </span>
-      </header>
+      <Navbar />
 
       {/* Summary bar */}
       <div className={styles.summaryBar}>

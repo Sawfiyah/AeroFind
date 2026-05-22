@@ -1,0 +1,108 @@
+/* ─── BASE NAVBAR ──────────────────────────────────────────── */
+.navbar {
+  height: var(--nav-height);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  cursor: pointer;
+  letter-spacing: -0.02em;
+}
+
+/* ─── DESKTOP LINKS ────────────────────────────────────────── */
+.navLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navLinks a {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  transition: color 0.15s;
+}
+
+.navLinks a:hover {
+  color: var(--color-text);
+}
+
+/* ─── HAMBURGER ────────────────────────────────────────────── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--color-text);
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+/* animate bars into an X when open */
+.barTopOpen {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.barMidOpen {
+  opacity: 0;
+}
+
+.barBotOpen {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ─── MOBILE DROPDOWN ──────────────────────────────────────── */
+.mobileMenu {
+  position: absolute;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  box-shadow: var(--shadow-md);
+  z-index: 99;
+}
+
+.mobileMenu a {
+  padding: 0.85rem 2rem;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+
+.mobileMenu a:hover {
+  background: var(--color-bg-secondary);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}

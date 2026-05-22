@@ -325,8 +325,8 @@
   box-shadow: var(--shadow-md);
 }
 
-.confirmIcon {
-  font-size: 3rem;
+.confirmImg {
+  width: 80px;
   margin-bottom: 1rem;
 }
 
@@ -396,4 +396,59 @@
 
 .newSearchBtn:hover {
   background: var(--color-primary-dark);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+    margin: 1.25rem auto;
+  }
+
+  /* move sidebar above the confirm button only — 
+     price card goes below the forms on mobile */
+  .sidebar {
+    position: static;
+    order: 2;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .contactGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .main {
+    padding: 0 1rem;
+  }
+
+  .card {
+    padding: 1.1rem;
+  }
+
+  .passengerCard {
+    padding: 1.1rem;
+  }
+
+  .flightSummary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .summaryMeta {
+    align-items: flex-start;
+  }
+
+  .confirmCard {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .confirmTitle {
+    font-size: 1.25rem;
+  }
 }
