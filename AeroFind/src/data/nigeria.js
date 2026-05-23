@@ -117,3 +117,47 @@ export function generateFlights(origin, destination, date) {
   // Sort by departure time
   return results.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
 }
+
+// ─── SEAT GENERATOR ─────────────────────────────────────────
+export const SEAT_COLS = ["A", "B", "C", "D", "E", "F"];
+export const TOTAL_ROWS = 30;
+
+export function getSeatType(row) {
+  if (row <= 4) return "business";
+  if (row <= 7) return "legroom";
+  return "economy";
+}
+
+export function getSeatUpgradePrice(row) {
+  if (row <= 4) return 25000;
+  if (row <= 7) return 10000;
+  return 0;
+}
+
+export function generateSeats(flightId) {
+  // use flightId as a seed so same flight always
+  // produces the same occupied pattern
+  let hash = 0;
+  for (let i = 0; i < flightId.length; i++) {
+    hash = (hash * 31 + flightId.charCodeAt(i)) & 0xffffffff;
+  }
+
+  const seats = {};
+  for (let row = 1; row <= TOTAL_ROWS; row++) {
+    for (const col of SEAT_COLS) {
+      const key = `${row}${col}`;
+      // pseudo-random but deterministic per flightId
+      hash = (hash * 1664525 + 1013904223) & 0xffffffff;
+      const occupied = Math.abs(hash) % 100 < 65; // ~65% occupied
+      seats[key] = {
+        id: key,
+        row,
+        col,
+        type: getSeatType(row),
+        upgrade: getSeatUpgradePrice(row),
+        occupied,
+      };
+    }
+  }
+  return seats;
+}

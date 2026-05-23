@@ -18,6 +18,7 @@
 
   --color-border: #e5e7eb;
   --color-border-strong: #d1d5db;
+  --color-occupied: #b1b8c5;
 
   --color-success: #16a34a;
   --color-success-light: #dcfce7;
@@ -58,6 +59,7 @@
 
     --color-border: #374151;
     --color-border-strong: #4b5563;
+    --color-occupied: #b1b8c5;
 
     --color-success: #4ade80;
     --color-success-light: #14532d;

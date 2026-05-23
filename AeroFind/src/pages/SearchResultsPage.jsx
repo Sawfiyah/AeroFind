@@ -79,10 +79,10 @@ export default function SearchResultsPage() {
       children,
       infants,
       tripType,
-      totalPrice: Math.round(getTotalPrice(flight.price)),
+      basePrice: flight.price,
       ...(returnDate ? { returnDate } : {}),
     });
-    navigate(`/booking?${params.toString()}`);
+    navigate(`/seats?${params.toString()}`);
   }
 
   // ─── GUARD ────────────────────────────────────────────────
@@ -164,9 +164,9 @@ export default function SearchResultsPage() {
               </button>
 
               {[
-                { key: "cheapest", label: "💰 Cheapest" },
-                { key: "earliest", label: "🕐 Earliest" },
-                { key: "fastest", label: "⚡ Fastest" },
+                { key: "cheapest", label: "Cheapest" },
+                { key: "earliest", label: "Earliest" },
+                { key: "fastest", label: "Fastest" },
               ].map(({ key, label }) => (
                 <button
                   key={key}

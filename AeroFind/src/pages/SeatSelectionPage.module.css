@@ -1,0 +1,368 @@
+/* ─── LAYOUT ───────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-secondary);
+}
+
+.main {
+  max-width: var(--max-width);
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ─── CABIN WRAP ───────────────────────────────────────────── */
+.cabinWrap {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.cabinHeader {
+  margin-bottom: 1.25rem;
+}
+
+.cabinTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.cabinSub {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 3px;
+}
+
+/* ─── LEGEND ───────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.legendDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.legendAvailable {
+  background: var(--color-occupied);
+  border: 1px solid var(--color-border-strong);
+}
+
+.legendSelected {
+  background: var(--color-primary);
+}
+
+.legendOccupied {
+  background: var(--color-border-strong);
+}
+
+.legendBusiness {
+  background: #fef3c7;
+  border: 1px solid #d97706;
+}
+
+.legendLegroom {
+  background: #dcfce7;
+  border: 1px solid #16a34a;
+}
+
+/* ─── CABIN MAP ────────────────────────────────────────────── */
+.cabin {
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 2rem;
+  flex-direction: column;
+}
+
+.colHeaders {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-left: 28px;
+  gap: 4px;
+}
+
+.rowNumSpacer {
+  width: 0;
+}
+
+.colHeader {
+  width: 32px;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text-subtle);
+  flex-shrink: 0;
+}
+
+/* ─── ROW ──────────────────────────────────────────────────── */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.rowNum {
+  width: 24px;
+  font-size: 0.65rem;
+  color: var(--color-text-subtle);
+  text-align: right;
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+/* ─── SEAT WRAPPER & AISLE ─────────────────────────────────── */
+.seatWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.aisle {
+  width: 16px;
+  flex-shrink: 0;
+}
+
+/* ─── SEAT ─────────────────────────────────────────────────── */
+.seat {
+  width: 30px;
+  height: 28px;
+  border-radius: 4px 4px 2px 2px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-occupied);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+
+.seat:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.seatOccupied {
+  background: var(--color-border);
+  border-color: var(--color-border);
+  color: transparent;
+  cursor: not-allowed;
+}
+
+.seatSelected {
+  background: var(--color-primary);
+  border-color: var(--color-primary-dark);
+  color: white;
+}
+
+.seatBusiness {
+  background: #fef3c7;
+  border-color: #d97706;
+}
+
+.seatLegroom {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+/* ─── SIDEBAR ──────────────────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: calc(var(--nav-height) + 1.5rem);
+}
+
+.summaryCard {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.summaryTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.summaryFlight {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 1rem;
+}
+
+.summaryRoute {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.summaryDate {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── SELECTED LIST ────────────────────────────────────────── */
+.selectedList {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.selectedRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.selectedRow:last-child {
+  border-bottom: none;
+}
+
+.selectedLabel {
+  color: var(--color-text-muted);
+}
+
+.selectedInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.selectedSeat {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.selectedUpgrade {
+  font-size: 0.75rem;
+  color: var(--color-warning);
+}
+
+.selectedEmpty {
+  font-size: 0.8rem;
+  color: var(--color-text-subtle);
+  font-style: italic;
+}
+
+/* ─── PRICE BREAKDOWN ──────────────────────────────────────── */
+.priceBreakdown {
+  margin-bottom: 1.25rem;
+}
+
+.priceRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  padding: 4px 0;
+}
+
+.priceRowTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  padding-top: 0.75rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* ─── BUTTONS ──────────────────────────────────────────────── */
+.continueBtn {
+  width: 100%;
+  padding: 12px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.15s;
+  margin-bottom: 8px;
+}
+
+.continueBtn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.continueBtn:disabled {
+  background: var(--color-border-strong);
+  cursor: not-allowed;
+  color: var(--color-text-muted);
+}
+
+.skipBtn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  transition: color 0.15s;
+}
+
+.skipBtn:hover {
+  color: var(--color-text);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .main {
+    grid-template-columns: 1fr;
+    margin: 1rem auto;
+    padding: 0 1rem;
+  }
+
+  .sidebar {
+    position: static;
+    order: -1;
+    /* show summary above the cabin map on mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .seat {
+    width: 26px;
+    height: 24px;
+  }
+
+  .aisle {
+    width: 10px;
+  }
+}
