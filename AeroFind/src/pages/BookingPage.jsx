@@ -27,6 +27,7 @@ export default function BookingPage() {
   const totalPrice = Number(searchParams.get("totalPrice"));
   const flightId = searchParams.get("flightId");
   const flightNumber = searchParams.get("flightNumber");
+  const cabinClass = searchParams.get("cabinClass") ?? "economy";
 
   // ─── DERIVED DATA ─────────────────────────────────────────
   const originAirport = AIRPORTS.find((a) => a.code === origin);
@@ -143,6 +144,12 @@ export default function BookingPage() {
               </span>
             </div>
             <div className={styles.confirmRow}>
+              <span className={styles.confirmRowLabel}>Class</span>
+              <span className={styles.confirmRowValue}>
+                {cabinClass === "business" ? "Business" : "Economy"}
+              </span>
+            </div>
+            <div className={styles.confirmRow}>
               <span className={styles.confirmRowLabel}>Date</span>
               <span className={styles.confirmRowValue}>{formatDate(date)}</span>
             </div>
@@ -223,6 +230,11 @@ export default function BookingPage() {
                   </span>
                   <span className={styles.summaryFlight}>{flightNumber}</span>
                   <span className={styles.summaryDate}>{formatDate(date)}</span>
+                  <span
+                    className={`${styles.summaryClass} ${cabinClass === "business" ? styles.summaryClassBusiness : styles.summaryClassEconomy}`}
+                  >
+                    {cabinClass === "business" ? "✦ Business" : "Economy"}
+                  </span>
                 </div>
               </div>
             </div>

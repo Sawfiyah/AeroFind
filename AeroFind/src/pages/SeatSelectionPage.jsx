@@ -5,6 +5,7 @@ import {
   SEAT_COLS,
   TOTAL_ROWS,
   getSeatType,
+  getSeatUpgradePrice,
 } from "../data/nigeria";
 import { formatPrice, formatDate } from "../utils/formatters";
 import Navbar from "../components/layout/Navbar";
@@ -26,6 +27,7 @@ export default function SeatSelectionPage() {
   const children = Number(searchParams.get("children"));
   const infants = Number(searchParams.get("infants"));
   const basePrice = Number(searchParams.get("basePrice"));
+  const cabinClass = searchParams.get("cabinClass") ?? "economy";
 
   // total seats to pick — infants share a lap, no seat needed
   const seatsNeeded = adults + children;
@@ -59,7 +61,10 @@ export default function SeatSelectionPage() {
   }
 
   // ─── UPGRADE COST ─────────────────────────────────────────
-  const upgradeCost = selected.reduce((sum, id) => sum + seats[id].upgrade, 0);
+  const upgradeCost = selected.reduce(
+    (sum, id) => sum + getSeatUpgradePrice(seats[id].row, cabinClass),
+    0,
+  );
 
   // ─── TOTAL PRICE ──────────────────────────────────────────
   const totalPrice = Math.round(
@@ -82,6 +87,7 @@ export default function SeatSelectionPage() {
       infants,
       tripType,
       totalPrice,
+      cabinClass,
       seats: selected.join(","),
       ...(returnDate ? { returnDate } : {}),
     });
@@ -122,6 +128,10 @@ export default function SeatSelectionPage() {
               { cls: styles.legendOccupied, label: "Occupied" },
               { cls: styles.legendBusiness, label: "Business" },
               { cls: styles.legendLegroom, label: "Extra legroom" },
+              // add this to the legend array conditionally
+              ...(cabinClass === "economy"
+                ? [{ cls: styles.legendLocked, label: "Business only" }]
+                : []),
             ].map(({ cls, label }) => (
               <div key={label} className={styles.legendItem}>
                 <div className={`${styles.legendDot} ${cls}`} />
@@ -152,28 +162,36 @@ export default function SeatSelectionPage() {
                   {SEAT_COLS.map((col, i) => {
                     const id = `${row}${col}`;
                     const state = getSeatState(id);
+                    const isBusinessRow = row <= 4;
+
+                    // economy passengers can't select business rows
+                    const isLocked = cabinClass === "economy" && isBusinessRow;
+
                     return (
                       <div key={col} className={styles.seatWrapper}>
                         {i === 3 && <div className={styles.aisle} />}
                         <button
                           className={`
-                            ${styles.seat}
-                            ${state === "occupied" ? styles.seatOccupied : ""}
-                            ${state === "selected" ? styles.seatSelected : ""}
-                            ${state === "available" && type === "business" ? styles.seatBusiness : ""}
-                            ${state === "available" && type === "legroom" ? styles.seatLegroom : ""}
-                          `}
-                          onClick={() => toggleSeat(id)}
-                          disabled={state === "occupied"}
+          ${styles.seat}
+          ${isLocked ? styles.seatLocked : ""}
+          ${!isLocked && state === "occupied" ? styles.seatOccupied : ""}
+          ${!isLocked && state === "selected" ? styles.seatSelected : ""}
+          ${!isLocked && state === "available" && type === "business" ? styles.seatBusiness : ""}
+          ${!isLocked && state === "available" && type === "legroom" ? styles.seatLegroom : ""}
+        `}
+                          onClick={() => !isLocked && toggleSeat(id)}
+                          disabled={state === "occupied" || isLocked}
                           title={
-                            state === "occupied"
-                              ? "Occupied"
-                              : seats[id].upgrade > 0
-                                ? `+${formatPrice(seats[id].upgrade)}`
-                                : "Available"
+                            isLocked
+                              ? "Business class only"
+                              : state === "occupied"
+                                ? "Occupied"
+                                : seats[id].upgrade > 0
+                                  ? `+${formatPrice(getSeatUpgradePrice(seats[id].row, cabinClass))}`
+                                  : "Available"
                           }
                         >
-                          {state === "selected" ? "✓" : ""}
+                          {state === "selected" ? "✓" : isLocked ? "" : ""}
                         </button>
                       </div>
                     );

@@ -403,3 +403,21 @@
     display: block;
   }
 }
+
+.classBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-xl);
+  width: fit-content;
+}
+
+.classBusiness {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.classEconomy {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+}

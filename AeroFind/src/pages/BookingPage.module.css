@@ -452,3 +452,21 @@
     font-size: 1.25rem;
   }
 }
+
+.summaryClass {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 10px;
+  border-radius: var(--radius-xl);
+  width: fit-content;
+}
+
+.summaryClassBusiness {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.summaryClassEconomy {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+}

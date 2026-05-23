@@ -23,12 +23,13 @@ export default function SearchResultsPage() {
   const children = Number(searchParams.get("children"));
   const infants = Number(searchParams.get("infants"));
   const totalPax = adults + children + infants;
+  const cabinClass = searchParams.get("cabinClass") ?? "economy";
 
   // ─── GENERATE + SORT FLIGHTS ──────────────────────────────
   // ─── GENERATE ONCE (only when route/date changes) ─────────
   const flights = useMemo(() => {
-    return generateFlights(origin, destination, date);
-  }, [origin, destination, date]); // ← sortBy removed from deps
+    return generateFlights(origin, destination, date, cabinClass);
+  }, [origin, destination, date, cabinClass]);
 
   // ─── SORT SEPARATELY (only when flights or sortBy changes) ─
   const sortedFlights = useMemo(() => {
@@ -79,6 +80,7 @@ export default function SearchResultsPage() {
       children,
       infants,
       tripType,
+      cabinClass,
       basePrice: flight.price,
       ...(returnDate ? { returnDate } : {}),
     });
@@ -120,6 +122,7 @@ export default function SearchResultsPage() {
                 returnDate &&
                 ` · Return ${formatDate(returnDate)}`}
               {` · ${totalPax} Passenger${totalPax > 1 ? "s" : ""}`}
+              {` · ${cabinClass === "business" ? "Business" : "Economy"}`}
             </div>
           </div>
           <button className={styles.modifyBtn} onClick={() => navigate(-1)}>
@@ -199,6 +202,11 @@ export default function SearchResultsPage() {
                   </span>
                   <span className={styles.flightNumber}>
                     {flight.flightNumber}
+                  </span>
+                  <span
+                    className={`${styles.classBadge} ${cabinClass === "business" ? styles.classBusiness : styles.classEconomy}`}
+                  >
+                    {cabinClass === "business" ? "Business" : "Economy"}
                   </span>
                 </div>
 

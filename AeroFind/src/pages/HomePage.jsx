@@ -20,6 +20,7 @@ export default function HomePage() {
   });
   const [showPaxDropdown, setShowPaxDropdown] = useState(false);
   const [error, setError] = useState("");
+  const [cabinClass, setCabinClass] = useState("economy");
 
   function updatePax(type, delta) {
     setPassengers((prev) => {
@@ -76,6 +77,7 @@ export default function HomePage() {
       children: passengers.children,
       infants: passengers.infants,
       tripType,
+      cabinClass,
       ...(tripType === "round" && returnDate ? { returnDate } : {}),
     });
 
@@ -159,6 +161,23 @@ export default function HomePage() {
                       {a.city} ({a.code})
                     </option>
                   ))}
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.classGrid}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="cabinClass">
+                  Class
+                </label>
+                <select
+                  id="cabinClass"
+                  className={styles.select}
+                  value={cabinClass}
+                  onChange={(e) => setCabinClass(e.target.value)}
+                >
+                  <option value="economy">Economy</option>
+                  <option value="business">Business</option>
                 </select>
               </div>
             </div>

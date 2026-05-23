@@ -68,12 +68,15 @@ function addMinutes(timeStr, mins) {
 }
 
 // ─── FLIGHT GENERATOR ───────────────────────────────────────
-export function generateFlights(origin, destination, date) {
+export function generateFlights(
+  origin,
+  destination,
+  date,
+  cabinClass = "economy",
+) {
   if (!origin || !destination || origin === destination) return [];
 
   const results = [];
-
-  // Each airline gets 1–2 departure slots per day
   const slots = [
     "06:00",
     "07:30",
@@ -91,10 +94,15 @@ export function generateFlights(origin, destination, date) {
 
     for (let i = 0; i < numFlights; i++) {
       const departureTime = slots[rand(0, slots.length - 1)];
-      const durationMins = rand(45, 110); // ~1h to ~1h50m domestic
+      const durationMins = rand(55, 110);
       const arrivalTime = addMinutes(departureTime, durationMins);
-      const stops = rand(0, 10) < 8 ? 0 : 1; // 80% direct
-      const basePrice = rand(55_000, 180_000); // NGN
+      const stops = rand(0, 10) < 8 ? 0 : 1;
+
+      // business class is ~2.5x the economy base price
+      const basePrice =
+        cabinClass === "business"
+          ? rand(160_000, 280_000)
+          : rand(55_000, 150_000);
 
       results.push({
         id: `${airline.code}-${date}-${origin}-${destination}-${i}`,
@@ -108,13 +116,13 @@ export function generateFlights(origin, destination, date) {
         durationMins,
         stops,
         price: basePrice,
+        cabinClass,
         seatsLeft: rand(2, 42),
-        class: "Economy",
+        class: cabinClass === "business" ? "Business" : "Economy",
       });
     }
   });
 
-  // Sort by departure time
   return results.sort((a, b) => a.departureTime.localeCompare(b.departureTime));
 }
 
@@ -128,7 +136,8 @@ export function getSeatType(row) {
   return "economy";
 }
 
-export function getSeatUpgradePrice(row) {
+export function getSeatUpgradePrice(row, cabinClass = "economy") {
+  if (cabinClass === "business") return 0;
   if (row <= 4) return 25000;
   if (row <= 7) return 10000;
   return 0;
