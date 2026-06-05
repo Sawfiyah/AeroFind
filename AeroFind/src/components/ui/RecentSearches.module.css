@@ -1,0 +1,114 @@
+.wrap {
+  margin-bottom: 2.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.clearBtn {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.clearBtn:hover {
+  color: var(--color-error);
+}
+
+/* ─── LIST ─────────────────────────────────────────────────── */
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ─── ITEM ─────────────────────────────────────────────────── */
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.item:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.itemLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.itemIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.itemRoute {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 3px;
+}
+
+.itemMeta {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.itemRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.classBadge {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-xl);
+}
+
+.classBusiness {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.classEconomy {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+}
+
+.itemArrow {
+  font-size: 0.9rem;
+  color: var(--color-text-subtle);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .itemRight .classBadge {
+    display: none;
+  }
+}

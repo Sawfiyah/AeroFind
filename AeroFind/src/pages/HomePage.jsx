@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AIRPORTS } from "../data/nigeria";
 import { todayString } from "../utils/formatters";
+import { useRecentSearches } from "../hooks/useRecentSearches";
+import RecentSearches from "../components/ui/RecentSearches";
 import Navbar from "../components/layout/Navbar";
 import styles from "./HomePage.module.css";
 
@@ -21,6 +23,8 @@ export default function HomePage() {
   const [showPaxDropdown, setShowPaxDropdown] = useState(false);
   const [error, setError] = useState("");
   const [cabinClass, setCabinClass] = useState("economy");
+  const { searches, saveSearch, clearSearches, getAirportCity } =
+    useRecentSearches();
 
   function updatePax(type, delta) {
     setPassengers((prev) => {
@@ -68,6 +72,18 @@ export default function HomePage() {
 
     setError("");
 
+    saveSearch({
+      origin,
+      destination,
+      date: departDate,
+      cabinClass,
+      adults: passengers.adults,
+      children: passengers.children,
+      infants: passengers.infants,
+      tripType,
+      returnDate,
+    });
+
     // pass search params via URL query string
     const params = new URLSearchParams({
       origin,
@@ -82,6 +98,22 @@ export default function HomePage() {
     });
 
     navigate(`/search?${params.toString()}`);
+  }
+
+  function handleRecentSelect(s) {
+    setOrigin(s.origin);
+    setDestination(s.destination);
+    setDepartDate(s.date);
+    setReturnDate(s.returnDate ?? "");
+    setTripType(s.tripType);
+    setCabinClass(s.cabinClass);
+    setPassengers({
+      adults: s.adults,
+      children: s.children,
+      infants: s.infants,
+    });
+    // scroll up to the form
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -300,6 +332,13 @@ export default function HomePage() {
 
       {/* Popular routes */}
       <main className={styles.main}>
+        <RecentSearches
+          searches={searches}
+          clearSearches={clearSearches}
+          getAirportCity={getAirportCity}
+          onSelect={handleRecentSelect}
+        />
+
         <p className={styles.sectionTitle}>Popular routes</p>
         <div className={styles.routesGrid}>
           {[
