@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Phone, Mail } from "lucide-react";
 import Navbar from "../components/layout/Navbar";
 import styles from "./HelpPage.module.css";
 
@@ -140,10 +141,10 @@ export default function HelpPage() {
           </div>
           <div className={styles.contactBtns}>
             <a href="mailto:support@aerofind.com" className={styles.contactBtn}>
-              ✉ Email us
+              <Mail size={20} /> <span>Email us</span>
             </a>
             <a href="tel:+2349000000000" className={styles.contactBtn}>
-              📞 Call us
+              <Phone size={20} strokeWidth={1.5} /> <span>Call us</span>
             </a>
           </div>
         </div>

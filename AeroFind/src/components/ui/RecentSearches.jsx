@@ -1,4 +1,5 @@
 import { formatDate } from "../../utils/formatters";
+import { Clock } from "lucide-react";
 import styles from "./RecentSearches.module.css";
 
 export default function RecentSearches({
@@ -28,7 +29,9 @@ export default function RecentSearches({
               onClick={() => onSelect(s)}
             >
               <div className={styles.itemLeft}>
-                <span className={styles.itemIcon}>🕐</span>
+                <span className={styles.itemIcon}>
+                  <Clock color="#798090" strokeWidth={1.5} />
+                </span>
                 <div>
                   <div className={styles.itemRoute}>
                     {getAirportCity(s.origin)} → {getAirportCity(s.destination)}

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -14,9 +14,31 @@ export default function Navbar() {
 
       {/* Desktop links */}
       <nav className={styles.navLinks}>
-        <Link to="/">Home</Link>
-        <Link to="/trips">My Trips</Link>
-        <Link to="/help">Help</Link>
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            isActive ? styles.navLinkActive : styles.navLink
+          }
+        >
+          Home
+        </NavLink>
+        <NavLink
+          to="/trips"
+          className={({ isActive }) =>
+            isActive ? styles.navLinkActive : styles.navLink
+          }
+        >
+          My Trips
+        </NavLink>
+        <NavLink
+          to="/help"
+          className={({ isActive }) =>
+            isActive ? styles.navLinkActive : styles.navLink
+          }
+        >
+          Help
+        </NavLink>
       </nav>
 
       {/* Hamburger button — mobile only */}
@@ -39,15 +61,15 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className={styles.mobileMenu}>
-          <Link to="/" onClick={() => setMenuOpen(false)}>
+          <NavLink to="/" end onClick={() => setMenuOpen(false)}>
             Home
-          </Link>
-          <Link to="/trips" onClick={() => setMenuOpen(false)}>
+          </NavLink>
+          <NavLink to="/trips" onClick={() => setMenuOpen(false)}>
             My Trips
-          </Link>
-          <Link to="/help" onClick={() => setMenuOpen(false)}>
+          </NavLink>
+          <NavLink to="/help" onClick={() => setMenuOpen(false)}>
             Help
-          </Link>
+          </NavLink>
         </div>
       )}
     </header>

@@ -21,19 +21,25 @@
 }
 
 /* ─── DESKTOP LINKS ────────────────────────────────────────── */
-.navLinks {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.navLinks a {
+.navLink {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   transition: color 0.15s;
+  padding-bottom: 3px;
+  padding-right: 10px;
 }
 
-.navLinks a:hover {
+.navLink:hover {
   color: var(--color-text);
+}
+
+.navLinkActive {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-primary);
+  padding-bottom: 3px;
+  margin-right: 10px;
 }
 
 /* ─── HAMBURGER ────────────────────────────────────────────── */
