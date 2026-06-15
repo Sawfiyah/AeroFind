@@ -163,9 +163,12 @@ export default function SeatSelectionPage() {
                     const id = `${row}${col}`;
                     const state = getSeatState(id);
                     const isBusinessRow = row <= 4;
+                    const isEconomyRow = row > 4;
 
                     // economy passengers can't select business rows
-                    const isLocked = cabinClass === "economy" && isBusinessRow;
+                    const isLocked =
+                      (cabinClass === "economy" && isBusinessRow) ||
+                      (cabinClass === "business" && isEconomyRow);
 
                     return (
                       <div key={col} className={styles.seatWrapper}>
@@ -186,7 +189,8 @@ export default function SeatSelectionPage() {
                               ? "Business class only"
                               : state === "occupied"
                                 ? "Occupied"
-                                : seats[id].upgrade > 0
+                                : seats[id].upgrade > 0 &&
+                                    cabinClass === "economy"
                                   ? `+${formatPrice(getSeatUpgradePrice(seats[id].row, cabinClass))}`
                                   : "Available"
                           }
@@ -226,11 +230,12 @@ export default function SeatSelectionPage() {
                       <span className={styles.selectedSeat}>
                         Seat {selected[i]}
                       </span>
-                      {seats[selected[i]].upgrade > 0 && (
-                        <span className={styles.selectedUpgrade}>
-                          +{formatPrice(seats[selected[i]].upgrade)}
-                        </span>
-                      )}
+                      {seats[selected[i]].upgrade > 0 &&
+                        cabinClass === "economy" && (
+                          <span className={styles.selectedUpgrade}>
+                            +{formatPrice(seats[selected[i]].upgrade)}
+                          </span>
+                        )}
                     </div>
                   ) : (
                     <span className={styles.selectedEmpty}>Not selected</span>
@@ -251,7 +256,7 @@ export default function SeatSelectionPage() {
             <div className={styles.priceBreakdown}>
               <div className={styles.priceRow}>
                 <span>Base fare</span>
-                <span>{formatPrice(totalPrice - upgradeCost)}</span>
+                {<span>{formatPrice(totalPrice - upgradeCost)}</span>}
               </div>
               {upgradeCost > 0 && (
                 <div className={styles.priceRow}>

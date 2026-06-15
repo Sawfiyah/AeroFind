@@ -1,0 +1,221 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-secondary);
+}
+
+.main {
+  max-width: 780px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  width: 100%;
+}
+
+/* ─── PAGE HEADER ──────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.pageTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.clearBtn {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.clearBtn:hover {
+  color: var(--color-error);
+}
+
+/* ─── EMPTY STATE ──────────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.emptyIcon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.emptyTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.searchBtn {
+  padding: 11px 24px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+
+.searchBtn:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ─── SECTION ──────────────────────────────────────────────── */
+.section {
+  margin-bottom: 2rem;
+}
+
+.sectionTitle {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-subtle);
+  margin-bottom: 0.75rem;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── BOOKING CARD ─────────────────────────────────────────── */
+.card {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid transparent;
+}
+
+.cardUpcoming {
+  border-left-color: var(--color-primary);
+}
+
+.cardPast {
+  border-left-color: var(--color-border-strong);
+  opacity: 0.8;
+}
+
+/* ─── CARD TOP ─────────────────────────────────────────────── */
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.cardRoute {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cardCity {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cardArrow {
+  font-size: 0.8rem;
+  color: var(--color-text-subtle);
+}
+
+.statusBadge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-xl);
+}
+
+.statusUpcoming {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.statusPast {
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-muted);
+}
+
+/* ─── CARD DETAILS ─────────────────────────────────────────── */
+.cardDetails {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+}
+
+.detail {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detailLabel {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-subtle);
+}
+
+.detailValue {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+/* ─── CARD FOOTER ──────────────────────────────────────────── */
+.cardFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cardRef {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  letter-spacing: 0.04em;
+}
+
+.cardContact {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+/* ─── RESPONSIVE ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .cardDetails {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cardCity {
+    font-size: 0.9rem;
+  }
+}

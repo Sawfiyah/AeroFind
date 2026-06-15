@@ -8,12 +8,15 @@ import {
   todayString,
   getPastDate,
 } from "../utils/formatters";
+import { useBookings } from "../hooks/useBookings";
 import styles from "./BookingPage.module.css";
 import tick from "../assets/tick.png";
 
 export default function BookingPage() {
+  const [bookingRef, setBookingRef] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { saveBooking } = useBookings();
 
   // ─── URL PARAMS ───────────────────────────────────────────
   const origin = searchParams.get("origin");
@@ -101,7 +104,34 @@ export default function BookingPage() {
     const err = validate();
     if (err) return setError(err);
     setError("");
+
+    // ── generate ref and save ──
+    const bookingRef = handleBookingRef();
+
+    saveBooking({
+      ref: bookingRef,
+      bookedAt: new Date().toISOString(),
+      origin,
+      destination,
+      date,
+      returnDate: returnDate ?? "",
+      tripType,
+      cabinClass: searchParams.get("cabinClass") ?? "economy",
+      adults,
+      children,
+      infants,
+      totalPrice,
+      flightId,
+      seats: searchParams.get("seats") ?? "",
+      contact: contact.email,
+      passengers: passengerForms.map((p, i) => ({
+        ...p,
+        type: passengerSlots[i],
+      })),
+    });
+
     setConfirmed(true);
+    setBookingRef(bookingRef);
   }
 
   // ─── GUARD ────────────────────────────────────────────────
@@ -125,7 +155,6 @@ export default function BookingPage() {
 
   // ─── CONFIRMATION SCREEN ──────────────────────────────────
   if (confirmed) {
-    const bookingRef = handleBookingRef();
     return (
       <div className={styles.confirmPage}>
         <div className={styles.confirmCard}>

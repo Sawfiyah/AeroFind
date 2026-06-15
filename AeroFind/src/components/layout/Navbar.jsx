@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -14,9 +14,9 @@ export default function Navbar() {
 
       {/* Desktop links */}
       <nav className={styles.navLinks}>
-        <a href="/">Home</a>
-        <a href="#">My Trips</a>
-        <a href="#">Help</a>
+        <Link to="/">Home</Link>
+        <Link to="/trips">My Trips</Link>
+        <Link to="/help">Help</Link>
       </nav>
 
       {/* Hamburger button — mobile only */}
@@ -39,15 +39,15 @@ export default function Navbar() {
       {/* Mobile dropdown */}
       {menuOpen && (
         <div className={styles.mobileMenu}>
-          <a href="/" onClick={() => setMenuOpen(false)}>
+          <Link to="/" onClick={() => setMenuOpen(false)}>
             Home
-          </a>
-          <a href="#" onClick={() => setMenuOpen(false)}>
+          </Link>
+          <Link to="/trips" onClick={() => setMenuOpen(false)}>
             My Trips
-          </a>
-          <a href="#" onClick={() => setMenuOpen(false)}>
+          </Link>
+          <Link to="/help" onClick={() => setMenuOpen(false)}>
             Help
-          </a>
+          </Link>
         </div>
       )}
     </header>
