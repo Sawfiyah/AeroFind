@@ -1,13 +1,54 @@
 import { useNavigate } from "react-router-dom";
-import { useBookings } from "../hooks/useBookings";
+// import { useBookings } from "../hooks/useBookings";
 import { AIRPORTS } from "../data/nigeria";
 import { formatPrice, formatDate } from "../utils/formatters";
+import { useEffect, useState } from "react";
+import { fetchBookings } from "../api/bookings";
+import useAuth from "../context/useAuth";
 import Navbar from "../components/layout/Navbar";
 import styles from "./MyTripsPage.module.css";
 
 export default function MyTripsPage() {
   const navigate = useNavigate();
-  const { bookings, clearBookings } = useBookings();
+  // const { bookings, clearBookings } = useBookings();
+  const { user } = useAuth();
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    async function load() {
+      setLoading(true);
+      try {
+        const data = await fetchBookings();
+        // normalise Django shape to match our card component
+        setBookings(
+          data.map((b) => ({
+            ref: b.booking_ref,
+            origin: b.flight.origin.code,
+            destination: b.flight.destination.code,
+            date: b.flight.date,
+            returnDate: "",
+            tripType: "oneway",
+            cabinClass: b.cabin_class,
+            adults: b.adults,
+            children: b.children,
+            infants: b.infants,
+            totalPrice: Number(b.total_price),
+            contact: user.email,
+            bookedAt: b.created_at,
+          })),
+        );
+      } catch {
+        setBookings([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, [user]);
 
   function getCity(code) {
     return AIRPORTS.find((a) => a.code === code)?.city ?? code;
@@ -19,8 +60,36 @@ export default function MyTripsPage() {
     );
   }
 
+  function clearBookings() {
+    setBookings([]);
+  }
+
   const upcoming = bookings.filter((b) => isUpcoming(b.date));
   const past = bookings.filter((b) => !isUpcoming(b.date));
+
+  // show a not-logged-in state if no user
+  if (!user && !loading) {
+    return (
+      <div className={styles.page}>
+        <Navbar />
+        <main className={styles.main}>
+          <div className={styles.empty}>
+            <div className={styles.emptyIcon}>✈</div>
+            <h2 className={styles.emptyTitle}>Log in to see your trips</h2>
+            <p className={styles.emptyText}>
+              Your bookings are saved to your account.
+            </p>
+            <button
+              className={styles.searchBtn}
+              onClick={() => navigate("/login")}
+            >
+              Log in
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>

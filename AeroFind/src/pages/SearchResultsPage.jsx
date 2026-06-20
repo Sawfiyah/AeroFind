@@ -1,10 +1,11 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useState, useMemo } from "react";
-import { generateFlights } from "../data/nigeria";
+import { useState, useMemo, useEffect } from "react";
+// import { generateFlights } from "../data/nigeria";
 import { formatPrice, formatDuration, formatDate } from "../utils/formatters";
 import { useFlightFilters } from "../hooks/useFlightFilters";
 import FlightFilters from "../components/ui/FlightFilters";
 import Navbar from "../components/layout/Navbar";
+import { searchFlights } from "../api/flights";
 import styles from "./SearchResultsPage.module.css";
 
 export default function SearchResultsPage() {
@@ -12,6 +13,9 @@ export default function SearchResultsPage() {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState("cheapest");
   const [showFilters, setShowFilters] = useState(false);
+  const [rawFlights, setRawFlights] = useState([]);
+  const [apiLoading, setApiLoading] = useState(true);
+  const [apiError, setApiError] = useState("");
 
   // ─── READ URL PARAMS ──────────────────────────────────────
   const origin = searchParams.get("origin");
@@ -27,22 +31,73 @@ export default function SearchResultsPage() {
 
   // ─── GENERATE + SORT FLIGHTS ──────────────────────────────
   // ─── GENERATE ONCE (only when route/date changes) ─────────
-  const flights = useMemo(() => {
-    return generateFlights(origin, destination, date, cabinClass);
+  // const flights = useMemo(() => {
+  //   return generateFlights(origin, destination, date, cabinClass);
+  // }, [origin, destination, date, cabinClass]);
+
+  // // ─── SORT SEPARATELY (only when flights or sortBy changes) ─
+  // const sortedFlights = useMemo(() => {
+  //   if (sortBy === "cheapest")
+  //     return [...flights].sort((a, b) => a.price - b.price);
+  //   if (sortBy === "earliest")
+  //     return [...flights].sort((a, b) =>
+  //       a.departureTime.localeCompare(b.departureTime),
+  //     );
+  //   if (sortBy === "fastest")
+  //     return [...flights].sort((a, b) => a.durationMins - b.durationMins);
+  //   return flights;
+  // }, [flights, sortBy]);
+
+  useEffect(() => {
+    async function load() {
+      setApiLoading(true);
+      setApiError("");
+      try {
+        const data = await searchFlights({
+          origin,
+          destination,
+          date,
+          cabinClass,
+        });
+        // normalise Django response to match our existing shape
+        setRawFlights(
+          data.map((f) => ({
+            id: String(f.id),
+            airline: { code: f.airline.code, name: f.airline.name },
+            flightNumber: f.flight_number,
+            origin: f.origin.code,
+            destination: f.destination.code,
+            date: f.date,
+            departureTime: f.departure_time.slice(0, 5), // "HH:MM:SS" → "HH:MM"
+            arrivalTime: f.arrival_time.slice(0, 5),
+            durationMins: f.duration_mins,
+            stops: f.stops,
+            price: Number(f.price),
+            seatsLeft: f.seats_left,
+            cabinClass: f.cabin_class,
+          })),
+        );
+      } catch {
+        setApiError("Could not load flights. Please try again.");
+      } finally {
+        setApiLoading(false);
+      }
+    }
+    if (origin && destination && date) load();
   }, [origin, destination, date, cabinClass]);
 
-  // ─── SORT SEPARATELY (only when flights or sortBy changes) ─
+  // sort stays exactly the same, just uses rawFlights instead of generated ones
   const sortedFlights = useMemo(() => {
     if (sortBy === "cheapest")
-      return [...flights].sort((a, b) => a.price - b.price);
+      return [...rawFlights].sort((a, b) => a.price - b.price);
     if (sortBy === "earliest")
-      return [...flights].sort((a, b) =>
+      return [...rawFlights].sort((a, b) =>
         a.departureTime.localeCompare(b.departureTime),
       );
     if (sortBy === "fastest")
-      return [...flights].sort((a, b) => a.durationMins - b.durationMins);
-    return flights;
-  }, [flights, sortBy]);
+      return [...rawFlights].sort((a, b) => a.durationMins - b.durationMins);
+    return rawFlights;
+  }, [rawFlights, sortBy]);
 
   const {
     stops,
@@ -81,6 +136,8 @@ export default function SearchResultsPage() {
       infants,
       tripType,
       cabinClass,
+      departureTime: flight.departureTime, // "HH:MM:SS" → "HH:MM"
+      arrivalTime: flight.arrivalTime,
       basePrice: flight.price,
       ...(returnDate ? { returnDate } : {}),
     });
@@ -183,7 +240,15 @@ export default function SearchResultsPage() {
           </div>
 
           {/* Flight cards */}
-          {filtered.length === 0 ? (
+          {apiLoading ? (
+            <div className={styles.empty}>
+              <p className={styles.emptyTitle}>Searching flights...</p>
+            </div>
+          ) : apiError ? (
+            <div className={styles.empty}>
+              <p className={styles.emptyTitle}>{apiError}</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className={styles.empty}>
               <p className={styles.emptyTitle}>No flights match your filters</p>
               <p className={styles.emptyText}>

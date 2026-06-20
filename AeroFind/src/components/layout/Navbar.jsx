@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
+import useAuth from "../../context/useAuth";
 import styles from "./Navbar.module.css";
+import { UserIcon } from "lucide-react";
 
 export default function Navbar() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   return (
     <header className={styles.navbar}>
@@ -39,6 +42,31 @@ export default function Navbar() {
         >
           Help
         </NavLink>
+        {user ? (
+          <div className={styles.userMenu}>
+            <button
+              className={styles.logoutBtn}
+              onClick={() => {
+                localStorage.removeItem("aerofind_recent_searches");
+                logout();
+              }}
+            >
+              Log out
+            </button>
+            <span className={styles.userName}>
+              <UserIcon /> {user.first_name}
+            </span>
+          </div>
+        ) : (
+          <div className={styles.authLinks}>
+            <NavLink to="/login" className={styles.navLink}>
+              Log in
+            </NavLink>
+            <NavLink to="/register" className={styles.loginBtn}>
+              Sign up
+            </NavLink>
+          </div>
+        )}
       </nav>
 
       {/* Hamburger button — mobile only */}
@@ -70,6 +98,31 @@ export default function Navbar() {
           <NavLink to="/help" onClick={() => setMenuOpen(false)}>
             Help
           </NavLink>
+          {user ? (
+            <div className={styles.userMenu}>
+              <button
+                className={styles.logoutBtn}
+                onClick={() => {
+                  localStorage.removeItem("aerofind_recent_searches");
+                  logout();
+                }}
+              >
+                Log out
+              </button>
+              <span className={styles.userName}>
+                <UserIcon /> {user.first_name}
+              </span>
+            </div>
+          ) : (
+            <div className={styles.authLinks}>
+              <NavLink to="/login" className={styles.navLink}>
+                Log in
+              </NavLink>
+              <NavLink to="/register" className={styles.loginBtn}>
+                Sign up
+              </NavLink>
+            </div>
+          )}
         </div>
       )}
     </header>

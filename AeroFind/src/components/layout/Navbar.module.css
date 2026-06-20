@@ -21,12 +21,17 @@
 }
 
 /* ─── DESKTOP LINKS ────────────────────────────────────────── */
+.navLinks {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+}
+
 .navLink {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   transition: color 0.15s;
   padding-bottom: 3px;
-  padding-right: 10px;
 }
 
 .navLink:hover {
@@ -39,7 +44,53 @@
   font-weight: 600;
   border-bottom: 2px solid var(--color-primary);
   padding-bottom: 3px;
-  margin-right: 10px;
+}
+
+/* ─── USER ────────────────────────────────────────────── */
+
+.userMenu {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.userName {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-primary);
+}
+
+.logoutBtn {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: color 0.15s;
+}
+
+.logoutBtn:hover {
+  color: var(--color-error);
+}
+
+.authLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.loginBtn {
+  padding: 7px 16px;
+  background: var(--color-primary);
+  color: white !important;
+  border-radius: var(--radius-xl);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background 0.15s;
+}
+
+.loginBtn:hover {
+  background: var(--color-primary-dark);
 }
 
 /* ─── HAMBURGER ────────────────────────────────────────────── */
@@ -89,6 +140,7 @@
   padding: 0.5rem 0;
   box-shadow: var(--shadow-md);
   z-index: 99;
+  align-items: center;
 }
 
 .mobileMenu a {
@@ -110,5 +162,24 @@
 
   .hamburger {
     display: flex;
+  }
+
+  .userMenu {
+    justify-content: space-between;
+    padding-left: 32px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-right: 20px;
+  }
+
+  .authLinks {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .loginBtn {
+    color: var(--color-text-muted);
+    background: none;
+    border-radius: 0;
   }
 }

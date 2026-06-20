@@ -21,6 +21,8 @@ export default function SeatSelectionPage() {
   const origin = searchParams.get("origin");
   const destination = searchParams.get("destination");
   const date = searchParams.get("date");
+  const departureTime = searchParams.get("departureTime");
+  const arrivalTime = searchParams.get("arrivalTime");
   const returnDate = searchParams.get("returnDate");
   const tripType = searchParams.get("tripType");
   const adults = Number(searchParams.get("adults"));
@@ -88,6 +90,8 @@ export default function SeatSelectionPage() {
       tripType,
       totalPrice,
       cabinClass,
+      departureTime,
+      arrivalTime,
       seats: selected.join(","),
       ...(returnDate ? { returnDate } : {}),
     });

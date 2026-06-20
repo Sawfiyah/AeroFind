@@ -1,14 +1,15 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
+import { createBooking } from "../api/bookings";
+import useAuth from "../context/useAuth";
 import { useState, useMemo } from "react";
 import { AIRPORTS, AIRLINES } from "../data/nigeria";
 import {
   formatPrice,
   formatDate,
-  handleBookingRef,
   todayString,
   getPastDate,
+  handleBookingRef,
 } from "../utils/formatters";
-import { useBookings } from "../hooks/useBookings";
 import styles from "./BookingPage.module.css";
 import tick from "../assets/tick.png";
 
@@ -16,12 +17,14 @@ export default function BookingPage() {
   const [bookingRef, setBookingRef] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { saveBooking } = useBookings();
+  const { user } = useAuth();
 
   // ─── URL PARAMS ───────────────────────────────────────────
   const origin = searchParams.get("origin");
   const destination = searchParams.get("destination");
   const date = searchParams.get("date");
+  const departureTime = searchParams.get("departureTime");
+  const arrivalTime = searchParams.get("arrivalTime");
   const returnDate = searchParams.get("returnDate");
   const tripType = searchParams.get("tripType");
   const adults = Number(searchParams.get("adults"));
@@ -63,6 +66,7 @@ export default function BookingPage() {
   const [contact, setContact] = useState({ email: "", phone: "" });
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // ─── HELPERS ──────────────────────────────────────────────
   function updatePassenger(index, field, value) {
@@ -99,39 +103,47 @@ export default function BookingPage() {
   }
 
   // ─── SUBMIT ───────────────────────────────────────────────
-  function handleConfirm(e) {
+  async function handleConfirm(e) {
     e.preventDefault();
     const err = validate();
     if (err) return setError(err);
+
+    // redirect to login if not authenticated
+    if (!user) {
+      setBookingRef(handleBookingRef());
+      setConfirmed(true);
+      return;
+    }
+
     setError("");
+    setLoading(true);
 
-    // ── generate ref and save ──
-    const bookingRef = handleBookingRef();
+    try {
+      const booking = await createBooking({
+        flight_id: Number(flightId),
+        total_price: totalPrice,
+        seats: searchParams.get("seats") ?? "",
+        cabin_class: cabinClass,
+        adults,
+        children,
+        infants,
+        passengers: passengerForms.map((p, i) => ({
+          first_name: p.firstName,
+          last_name: p.lastName,
+          gender: p.gender,
+          dob: p.dob || null,
+          pax_type: passengerSlots[i],
+        })),
+      });
 
-    saveBooking({
-      ref: bookingRef,
-      bookedAt: new Date().toISOString(),
-      origin,
-      destination,
-      date,
-      returnDate: returnDate ?? "",
-      tripType,
-      cabinClass: searchParams.get("cabinClass") ?? "economy",
-      adults,
-      children,
-      infants,
-      totalPrice,
-      flightId,
-      seats: searchParams.get("seats") ?? "",
-      contact: contact.email,
-      passengers: passengerForms.map((p, i) => ({
-        ...p,
-        type: passengerSlots[i],
-      })),
-    });
-
-    setConfirmed(true);
-    setBookingRef(bookingRef);
+      setBookingRef(booking.booking_ref);
+      setConfirmed(true);
+    } catch (err) {
+      console.log(err);
+      setError("Booking failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   // ─── GUARD ────────────────────────────────────────────────
@@ -225,7 +237,7 @@ export default function BookingPage() {
         <span className={styles.logo} onClick={() => navigate("/")}>
           ✈ AeroFind
         </span>
-        <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <button className={styles.backBtn} onClick={() => navigate(-2)}>
           ← Back to results
         </button>
       </header>
@@ -241,14 +253,14 @@ export default function BookingPage() {
                 <div className={styles.summaryTimes}>
                   <div className={styles.summaryTimeBlock}>
                     <span className={styles.summaryTime}>
-                      {flightId?.split("-")[4] ?? "--:--"}
+                      {departureTime ?? "--:--"}
                     </span>
                     <span className={styles.summaryAirport}>{origin}</span>
                   </div>
                   <span className={styles.summaryArrow}>——✈——</span>
                   <div className={styles.summaryTimeBlock}>
                     <span className={styles.summaryTime}>
-                      {flightId?.split("-")[5] ?? "--:--"}
+                      {arrivalTime ?? "--:--"}
                     </span>
                     <span className={styles.summaryAirport}>{destination}</span>
                   </div>
@@ -436,8 +448,12 @@ export default function BookingPage() {
                 <span>{formatPrice(totalPrice)}</span>
               </div>
 
-              <button type="submit" className={styles.confirmBtn}>
-                Confirm booking →
+              <button
+                type="submit"
+                className={styles.confirmBtn}
+                disabled={loading}
+              >
+                {loading ? "Confirming..." : "Confirm booking →"}
               </button>
 
               <p className={styles.secureNote}>
