@@ -6,6 +6,7 @@ from .models import Booking
 from .serializers import BookingSerializer
 import stripe
 from django.conf import settings
+from .email import send_booking_confirmation
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -77,3 +78,20 @@ def booking_detail(request, ref):
         )
 
     return Response(BookingSerializer(booking).data)
+
+
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
+def bookings(request):
+    if request.method == "POST":
+        serializer = BookingSerializer(data=request.data)
+        if serializer.is_valid():
+            booking = serializer.save(user=request.user)
+
+            # ── send confirmation email ──
+            send_booking_confirmation(booking)
+
+            return Response(
+                BookingSerializer(booking).data, status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
