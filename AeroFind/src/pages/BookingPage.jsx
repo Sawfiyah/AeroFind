@@ -157,7 +157,9 @@ export default function BookingPage() {
     if (err) return setError(err);
 
     if (!user) {
-      navigate("/login");
+      navigate(
+        `/login?redirect=${encodeURIComponent(window.location.pathname + window.location.search)}`,
+      );
       return;
     }
 

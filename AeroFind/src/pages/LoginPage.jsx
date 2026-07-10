@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { login } from "../api/auth";
 import { getMe } from "../api/auth";
 import useAuth from "../context/useAuth";
@@ -9,6 +9,8 @@ import styles from "./AuthPage.module.css";
 export default function LoginPage() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect") || "/";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +27,7 @@ export default function LoginPage() {
       const me = await getMe();
       setUser(me);
       localStorage.removeItem("aerofind_recent_searches");
-      navigate("/");
+      navigate(decodeURIComponent(redirect));
     } catch {
       setError("Invalid username or password.");
     } finally {
