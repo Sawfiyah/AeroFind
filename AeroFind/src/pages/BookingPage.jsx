@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { createBooking, createPaymentIntent } from "../api/bookings";
+import { createPaymentIntent } from "../api/bookings";
 import useAuth from "../context/useAuth";
 import { useState, useMemo } from "react";
 import { AIRPORTS, AIRLINES } from "../data/nigeria";
@@ -8,18 +8,12 @@ import {
   formatDate,
   todayString,
   getPastDate,
-  handleBookingRef,
 } from "../utils/formatters";
 import styles from "./BookingPage.module.css";
 import tick from "../assets/tick.png";
 import PaymentForm from "../components/ui/PaymentForm";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export default function BookingPage() {
