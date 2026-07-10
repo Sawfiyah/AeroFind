@@ -11,3 +11,9 @@ export async function fetchBookings() {
 export async function fetchBookingByRef(ref) {
   return api.get(`/bookings/${ref}/`);
 }
+
+export async function createPaymentIntent(totalPrice) {
+  return api.post("/bookings/create-payment-intent/", {
+    total_price: totalPrice,
+  });
+}

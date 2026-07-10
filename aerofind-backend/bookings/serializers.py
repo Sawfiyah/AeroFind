@@ -28,6 +28,7 @@ class BookingSerializer(serializers.ModelSerializer):
             "adults",
             "children",
             "infants",
+            "stripe_payment_id",  # ← add this
             "flight",
             "flight_id",
             "passengers",

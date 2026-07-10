@@ -24,6 +24,7 @@ class Booking(models.Model):
     adults = models.IntegerField(default=1)
     children = models.IntegerField(default=0)
     infants = models.IntegerField(default=0)
+    stripe_payment_id = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return f"{self.booking_ref} — {self.user.username}"

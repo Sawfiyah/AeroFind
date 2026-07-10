@@ -1,5 +1,5 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { createBooking } from "../api/bookings";
+import { createBooking, createPaymentIntent } from "../api/bookings";
 import useAuth from "../context/useAuth";
 import { useState, useMemo } from "react";
 import { AIRPORTS, AIRLINES } from "../data/nigeria";
@@ -12,12 +12,23 @@ import {
 } from "../utils/formatters";
 import styles from "./BookingPage.module.css";
 import tick from "../assets/tick.png";
+import PaymentForm from "../components/ui/PaymentForm";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 export default function BookingPage() {
   const [bookingRef, setBookingRef] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [step, setStep] = useState("details"); // 'details' | 'payment'
+  const [clientSecret, setClientSecret] = useState("");
 
   // ─── URL PARAMS ───────────────────────────────────────────
   const origin = searchParams.get("origin");
@@ -103,15 +114,56 @@ export default function BookingPage() {
   }
 
   // ─── SUBMIT ───────────────────────────────────────────────
+  // async function handleConfirm(e) {
+  //   e.preventDefault();
+  //   const err = validate();
+  //   if (err) return setError(err);
+
+  //   // redirect to login if not authenticated
+  //   if (!user) {
+  //     setBookingRef(handleBookingRef());
+  //     setConfirmed(true);
+  //     return;
+  //   }
+
+  //   setError("");
+  //   setLoading(true);
+
+  //   try {
+  //     const booking = await createBooking({
+  //       flight_id: Number(flightId),
+  //       total_price: totalPrice,
+  //       seats: searchParams.get("seats") ?? "",
+  //       cabin_class: cabinClass,
+  //       adults,
+  //       children,
+  //       infants,
+  //       passengers: passengerForms.map((p, i) => ({
+  //         first_name: p.firstName,
+  //         last_name: p.lastName,
+  //         gender: p.gender,
+  //         dob: p.dob || null,
+  //         pax_type: passengerSlots[i],
+  //       })),
+  //     });
+
+  //     setBookingRef(booking.booking_ref);
+  //     setConfirmed(true);
+  //   } catch (err) {
+  //     console.log(err);
+  //     setError("Booking failed. Please try again.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
+
   async function handleConfirm(e) {
     e.preventDefault();
     const err = validate();
     if (err) return setError(err);
 
-    // redirect to login if not authenticated
     if (!user) {
-      setBookingRef(handleBookingRef());
-      setConfirmed(true);
+      navigate("/login");
       return;
     }
 
@@ -119,28 +171,11 @@ export default function BookingPage() {
     setLoading(true);
 
     try {
-      const booking = await createBooking({
-        flight_id: Number(flightId),
-        total_price: totalPrice,
-        seats: searchParams.get("seats") ?? "",
-        cabin_class: cabinClass,
-        adults,
-        children,
-        infants,
-        passengers: passengerForms.map((p, i) => ({
-          first_name: p.firstName,
-          last_name: p.lastName,
-          gender: p.gender,
-          dob: p.dob || null,
-          pax_type: passengerSlots[i],
-        })),
-      });
-
-      setBookingRef(booking.booking_ref);
-      setConfirmed(true);
-    } catch (err) {
-      console.log(err);
-      setError("Booking failed. Please try again.");
+      const data = await createPaymentIntent(totalPrice);
+      setClientSecret(data.client_secret);
+      setStep("payment");
+    } catch {
+      setError("Could not initiate payment. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -242,181 +277,222 @@ export default function BookingPage() {
         </button>
       </header>
 
-      <form onSubmit={handleConfirm}>
+      <div>
         <div className={styles.main}>
           {/* ── LEFT COLUMN ── */}
-          <div>
-            {/* Flight summary */}
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Your Flight</h2>
-              <div className={styles.flightSummary}>
-                <div className={styles.summaryTimes}>
-                  <div className={styles.summaryTimeBlock}>
-                    <span className={styles.summaryTime}>
-                      {departureTime ?? "--:--"}
-                    </span>
-                    <span className={styles.summaryAirport}>{origin}</span>
-                  </div>
-                  <span className={styles.summaryArrow}>——✈——</span>
-                  <div className={styles.summaryTimeBlock}>
-                    <span className={styles.summaryTime}>
-                      {arrivalTime ?? "--:--"}
-                    </span>
-                    <span className={styles.summaryAirport}>{destination}</span>
+          {step === "details" && (
+            <>
+              {/* ── all your existing form content stays here unchanged ── */}
+              {/* flight summary, passenger cards, contact details */}
+              <div>
+                {/* Flight summary */}
+                <div className={styles.card}>
+                  <h2 className={styles.cardTitle}>Your Flight</h2>
+                  <div className={styles.flightSummary}>
+                    <div className={styles.summaryTimes}>
+                      <div className={styles.summaryTimeBlock}>
+                        <span className={styles.summaryTime}>
+                          {departureTime ?? "--:--"}
+                        </span>
+                        <span className={styles.summaryAirport}>{origin}</span>
+                      </div>
+                      <span className={styles.summaryArrow}>——✈——</span>
+                      <div className={styles.summaryTimeBlock}>
+                        <span className={styles.summaryTime}>
+                          {arrivalTime ?? "--:--"}
+                        </span>
+                        <span className={styles.summaryAirport}>
+                          {destination}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.summaryMeta}>
+                      <span className={styles.summaryAirline}>
+                        {airline?.name ?? "Airline"}
+                      </span>
+                      <span className={styles.summaryFlight}>
+                        {flightNumber}
+                      </span>
+                      <span className={styles.summaryDate}>
+                        {formatDate(date)}
+                      </span>
+                      <span
+                        className={`${styles.summaryClass} ${cabinClass === "business" ? styles.summaryClassBusiness : styles.summaryClassEconomy}`}
+                      >
+                        {cabinClass === "business" ? "✦ Business" : "Economy"}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className={styles.summaryMeta}>
-                  <span className={styles.summaryAirline}>
-                    {airline?.name ?? "Airline"}
-                  </span>
-                  <span className={styles.summaryFlight}>{flightNumber}</span>
-                  <span className={styles.summaryDate}>{formatDate(date)}</span>
-                  <span
-                    className={`${styles.summaryClass} ${cabinClass === "business" ? styles.summaryClassBusiness : styles.summaryClassEconomy}`}
-                  >
-                    {cabinClass === "business" ? "✦ Business" : "Economy"}
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            {/* Passenger forms */}
-            {passengerSlots.map((type, index) => (
-              <div key={index} className={styles.passengerCard}>
-                <div className={styles.passengerHeader}>
-                  <h3 className={styles.passengerTitle}>
-                    Passenger {index + 1}
-                  </h3>
-                  <span
-                    className={`${styles.passengerBadge} ${badgeClass(type)}`}
-                  >
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </span>
-                </div>
+                {/* Passenger forms */}
+                {passengerSlots.map((type, index) => (
+                  <div key={index} className={styles.passengerCard}>
+                    <div className={styles.passengerHeader}>
+                      <h3 className={styles.passengerTitle}>
+                        Passenger {index + 1}
+                      </h3>
+                      <span
+                        className={`${styles.passengerBadge} ${badgeClass(type)}`}
+                      >
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                      </span>
+                    </div>
 
-                <div className={styles.formGrid}>
-                  <div className={styles.field}>
-                    <label className={styles.label}>First name</label>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g. Sawfiyah"
-                      value={passengerForms[index].firstName}
-                      onChange={(e) =>
-                        updatePassenger(index, "firstName", e.target.value)
-                      }
-                    />
+                    <div className={styles.formGrid}>
+                      <div className={styles.field}>
+                        <label className={styles.label}>First name</label>
+                        <input
+                          className={styles.input}
+                          type="text"
+                          placeholder="e.g. Sawfiyah"
+                          value={passengerForms[index].firstName}
+                          onChange={(e) =>
+                            updatePassenger(index, "firstName", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <div className={styles.field}>
+                        <label className={styles.label}>Last name</label>
+                        <input
+                          className={styles.input}
+                          type="text"
+                          placeholder="e.g. Bagudu"
+                          value={passengerForms[index].lastName}
+                          onChange={(e) =>
+                            updatePassenger(index, "lastName", e.target.value)
+                          }
+                        />
+                      </div>
+
+                      <div
+                        className={`${styles.field} ${type !== "adult" ? "" : styles.formGridFull}`}
+                      >
+                        <label className={styles.label}>Gender</label>
+                        <select
+                          className={styles.select}
+                          value={passengerForms[index].gender}
+                          onChange={(e) =>
+                            updatePassenger(index, "gender", e.target.value)
+                          }
+                        >
+                          <option value="">Select</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Prefer not to say</option>
+                        </select>
+                      </div>
+
+                      {type === "infant" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>Date of birth</label>
+                          <input
+                            className={styles.input}
+                            type="date"
+                            max={todayString()}
+                            min={getPastDate(2)}
+                            value={passengerForms[index].dob}
+                            onChange={(e) =>
+                              updatePassenger(index, "dob", e.target.value)
+                            }
+                          />
+                        </div>
+                      )}
+
+                      {type === "child" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>Date of birth</label>
+                          <input
+                            className={styles.input}
+                            type="date"
+                            max={getPastDate(2)}
+                            min={getPastDate(11)}
+                            value={passengerForms[index].dob}
+                            onChange={(e) =>
+                              updatePassenger(index, "dob", e.target.value)
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
+                ))}
 
-                  <div className={styles.field}>
-                    <label className={styles.label}>Last name</label>
-                    <input
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g. Bagudu"
-                      value={passengerForms[index].lastName}
-                      onChange={(e) =>
-                        updatePassenger(index, "lastName", e.target.value)
-                      }
-                    />
-                  </div>
-
-                  <div
-                    className={`${styles.field} ${type !== "adult" ? "" : styles.formGridFull}`}
-                  >
-                    <label className={styles.label}>Gender</label>
-                    <select
-                      className={styles.select}
-                      value={passengerForms[index].gender}
-                      onChange={(e) =>
-                        updatePassenger(index, "gender", e.target.value)
-                      }
-                    >
-                      <option value="">Select</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Prefer not to say</option>
-                    </select>
-                  </div>
-
-                  {type === "infant" && (
+                {/* Contact details */}
+                <div className={styles.card}>
+                  <h2 className={styles.cardTitle}>Contact Details</h2>
+                  <div className={styles.contactGrid}>
                     <div className={styles.field}>
-                      <label className={styles.label}>Date of birth</label>
+                      <label className={styles.label}>Email address</label>
                       <input
                         className={styles.input}
-                        type="date"
-                        max={todayString()}
-                        min={getPastDate(2)}
-                        value={passengerForms[index].dob}
+                        type="email"
+                        placeholder="you@example.com"
+                        value={contact.email}
                         onChange={(e) =>
-                          updatePassenger(index, "dob", e.target.value)
+                          setContact({ ...contact, email: e.target.value })
                         }
                       />
                     </div>
-                  )}
-
-                  {type === "child" && (
                     <div className={styles.field}>
-                      <label className={styles.label}>Date of birth</label>
+                      <label className={styles.label}>Phone number</label>
                       <input
                         className={styles.input}
-                        type="date"
-                        max={getPastDate(2)}
-                        min={getPastDate(11)}
-                        value={passengerForms[index].dob}
+                        type="tel"
+                        placeholder="08012345678"
+                        value={contact.phone}
                         onChange={(e) =>
-                          updatePassenger(index, "dob", e.target.value)
+                          setContact({ ...contact, phone: e.target.value })
                         }
                       />
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            ))}
 
-            {/* Contact details */}
-            <div className={styles.card}>
-              <h2 className={styles.cardTitle}>Contact Details</h2>
-              <div className={styles.contactGrid}>
-                <div className={styles.field}>
-                  <label className={styles.label}>Email address</label>
-                  <input
-                    className={styles.input}
-                    type="email"
-                    placeholder="you@example.com"
-                    value={contact.email}
-                    onChange={(e) =>
-                      setContact({ ...contact, email: e.target.value })
-                    }
-                  />
-                </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>Phone number</label>
-                  <input
-                    className={styles.input}
-                    type="tel"
-                    placeholder="08012345678"
-                    value={contact.phone}
-                    onChange={(e) =>
-                      setContact({ ...contact, phone: e.target.value })
-                    }
-                  />
-                </div>
+                {error && <p className={styles.error}>⚠ {error}</p>}
               </div>
+            </>
+          )}
+
+          {step === "payment" && clientSecret && (
+            <div className={styles.paymentWrap}>
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <PaymentForm
+                  clientSecret={clientSecret}
+                  totalPrice={totalPrice}
+                  passengerForms={passengerForms}
+                  passengerSlots={passengerSlots}
+                  contact={contact}
+                  searchParams={searchParams}
+                  flightId={flightId}
+                  origin={origin}
+                  destination={destination}
+                  date={date}
+                  adults={adults}
+                  children={children}
+                  infants={infants}
+                  cabinClass={cabinClass}
+                  returnDate={returnDate}
+                  tripType={tripType}
+                  onSuccess={(ref) => {
+                    setBookingRef(ref);
+                    setConfirmed(true);
+                  }}
+                  onBack={() => setStep("details")}
+                />
+              </Elements>
             </div>
-
-            {error && <p className={styles.error}>⚠ {error}</p>}
-          </div>
+          )}
 
           {/* ── RIGHT SIDEBAR ── */}
           <div className={styles.sidebar}>
             <div className={styles.priceCard}>
               <h3 className={styles.priceTitle}>Price Summary</h3>
-
               {adults > 0 && (
                 <div className={styles.priceRow}>
                   <span>
-                    {adults} Adult{adults > 1 ? "s" : ""} x{" "}
+                    {adults} Adult{adults > 1 ? "s" : ""} ×{" "}
                     {formatPrice(basePricePerAdult)}
                   </span>
                   <span>{formatPrice(basePricePerAdult * adults)}</span>
@@ -425,7 +501,7 @@ export default function BookingPage() {
               {children > 0 && (
                 <div className={styles.priceRow}>
                   <span>
-                    {children} Child{children > 1 ? "ren" : ""} x{" "}
+                    {children} Child{children > 1 ? "ren" : ""} ×{" "}
                     {formatPrice(basePricePerAdult * 0.75)}
                   </span>
                   <span>
@@ -442,27 +518,27 @@ export default function BookingPage() {
                   <span>{formatPrice(basePricePerAdult * 0.1 * infants)}</span>
                 </div>
               )}
-
               <div className={styles.priceRowTotal}>
                 <span>Total</span>
                 <span>{formatPrice(totalPrice)}</span>
               </div>
 
-              <button
-                type="submit"
-                className={styles.confirmBtn}
-                disabled={loading}
-              >
-                {loading ? "Confirming..." : "Confirm booking →"}
-              </button>
+              {step === "details" && (
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className={styles.confirmBtn}
+                  disabled={loading}
+                >
+                  {loading ? "Please wait..." : "Continue to payment →"}
+                </button>
+              )}
 
-              <p className={styles.secureNote}>
-                🔒 Secure booking · No hidden fees
-              </p>
+              <p className={styles.secureNote}>🔒 Secure payment via Stripe</p>
             </div>
           </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 }
