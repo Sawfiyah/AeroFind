@@ -110,7 +110,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://aero-find.vercel.app",
+    "https://fly-aero-find.vercel.app",
 ]
 
 # ─── REST FRAMEWORK ──────────────────────────────────────────
